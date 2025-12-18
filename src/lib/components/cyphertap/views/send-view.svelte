@@ -433,16 +433,24 @@
 								placeholder="Enter amount in sats"
 							/>
 
-							<div class="flex flex-wrap gap-2">
+							<div class="flex gap-2">
 								{#each presetAmounts as preset}
 									<Button
 										variant="outline"
 										size="sm"
 										onclick={() => (tokenAmount = preset.value.toString())}
 									>
-										{preset.label}
+										{preset.value}
 									</Button>
 								{/each}
+								<Button
+									variant="outline"
+									size="sm"
+									onclick={() => (tokenAmount = $walletBalance.toString())}
+									disabled={$walletBalance < 1}
+								>
+									Max
+								</Button>
 							</div>
 						</div>
 
