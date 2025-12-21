@@ -198,7 +198,7 @@ export class CyphertapAPI {
     };
   }
 
-  subscribe(filter: NDKFilter, callback: (event: { id: string; pubkey: string; content: string; kind: number; created_at: number }) => void): () => void {
+  subscribe(filter: NDKFilter, callback: (event: { id: string; pubkey: string; content: string; kind: number; created_at: number; tags?: string[][] }) => void): () => void {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
     
@@ -209,7 +209,8 @@ export class CyphertapAPI {
         pubkey: event.pubkey || '',
         content: event.content || '',
         kind: event.kind || 0,
-        created_at: event.created_at || 0
+        created_at: event.created_at || 0,
+        tags: event.tags || []
       });
     });
     
