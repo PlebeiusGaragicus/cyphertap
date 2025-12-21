@@ -193,8 +193,8 @@ export class CyphertapAPI {
     await ndkEvent.publish();
     
     return {
-      id: event.id || '',
-      pubkey: event.pubkey || ''
+      id: ndkEvent.id || '',
+      pubkey: ndkEvent.pubkey || ''
     };
   }
 
