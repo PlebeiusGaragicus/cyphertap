@@ -30,11 +30,13 @@
 </script>
 
 <Dialog>
-	<DialogTrigger>
-		<Button {variant} {size} class={className}>
-			<LogOut class="mr-2 h-4 w-4" />
-			Sign Out
-		</Button>
+	<DialogTrigger asChild>
+		{#snippet child({ props })}
+			<Button {...props} {variant} {size} class={className}>
+				<LogOut class="mr-2 h-4 w-4" />
+				Sign Out
+			</Button>
+		{/snippet}
 	</DialogTrigger>
 
 	<DialogContent class="sm:max-w-[425px]">
@@ -77,11 +79,13 @@
 			</div>
 		</div>
 
-		<DialogFooter>
-			<DialogClose>
-				<Button variant="outline">Cancel</Button>
-			</DialogClose>
-			<Button variant="destructive" onclick={handleConfirmLogout}>Sign Out</Button>
-		</DialogFooter>
+	<DialogFooter>
+		<DialogClose asChild>
+			{#snippet child({ props })}
+				<Button {...props} variant="outline">Cancel</Button>
+			{/snippet}
+		</DialogClose>
+		<Button variant="destructive" onclick={handleConfirmLogout}>Sign Out</Button>
+	</DialogFooter>
 	</DialogContent>
 </Dialog>
