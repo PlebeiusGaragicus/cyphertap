@@ -30,16 +30,16 @@ UX: encrypting at rest means auto-login can no longer be silent. Options:
 - **Document and defer**: keep as-is; state plainly in the README that keys
   are hot and the wallet is for pocket-money amounts.
 
-## 2. Test suite is a placeholder — **MOSTLY RESOLVED 2026-07-10**
+## 2. Test suite is a placeholder — **RESOLVED 2026-07-10**
 
 API contract tests landed (`src/lib/api/cyphertap-api.spec.ts`,
 `src/lib/utils/latest.spec.ts`): publish error-handling contract
 (NDKPublishError tolerated, everything else rethrown), publishAddressable
 d-tag shape, subscribeLatest dedup + options, NIP-44/sign round-trips with
-real crypto, generateEcashToken encode/guard path. Still open:
-
-- `src/lib/utils/nip49.ts` — pure crypto, easy to test, catastrophic if wrong
-  (NIP-49 spec has test vectors; nostr-tools' nip49 tests are a reference).
+real crypto, generateEcashToken encode/guard path. `src/lib/utils/nip49.ts`
+is covered by `nip49.spec.ts`: the official spec decryption vector, NFKC
+password normalization, payload layout, AAD tamper rejection, and signer
+round-trips.
 
 ## 3. `cashuPay` type casts
 
