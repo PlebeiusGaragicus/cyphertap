@@ -252,15 +252,14 @@ export class CyphertapAPI {
     };
   }
 
-  // Encryption/Decryption
+  // Encryption/Decryption (NIP-44)
   async encrypt(content: string, recipientPubkey: string): Promise<string> {
     const ndk = get(ndkInstance);
-    const user = get(currentUser);
-    
-    if (!ndk?.signer || !user) {
+    if (!ndk?.signer) {
       throw new Error('Signer not available');
     }
-    return await ndk.signer.encrypt(user, content, recipientPubkey);
+    const recipient = ndk.getUser({ pubkey: recipientPubkey });
+    return await ndk.signer.encrypt(recipient, content, 'nip44');
   }
 
   async decrypt(encryptedContent: string, senderPubkey: string): Promise<string> {
@@ -268,7 +267,8 @@ export class CyphertapAPI {
     if (!ndk?.signer) {
       throw new Error('Signer not available');
     }
-    return await ndk.signer.decrypt(encryptedContent, senderPubkey);
+    const sender = ndk.getUser({ pubkey: senderPubkey });
+    return await ndk.signer.decrypt(sender, encryptedContent, 'nip44');
   }
 
   // Utility methods
