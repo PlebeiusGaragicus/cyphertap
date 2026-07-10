@@ -1,12 +1,24 @@
 <script lang="ts">
     import { cn } from "$lib/utils.js";
-    let className: any = "";
-    export { className as class };
-    export let cw: boolean = true; // clock-wise orbit
-    export let duration: number = 20;
-    export let theta: number = 0; //0-360 degrees
-    export let radius: number = 50;
-    export let path: boolean = true;
+    import type { Snippet } from "svelte";
+
+    let {
+      class: className = "",
+      cw = true, // clock-wise orbit
+      duration = 20,
+      theta = 0, // 0-360 degrees
+      radius = 50,
+      path = true,
+      children
+    }: {
+      class?: string;
+      cw?: boolean;
+      duration?: number;
+      theta?: number;
+      radius?: number;
+      path?: boolean;
+      children?: Snippet;
+    } = $props();
   </script>
   
   {#if path}
@@ -33,7 +45,7 @@
         className
       )}
     >
-      <slot></slot>
+      {@render children?.()}
     </div>
   {/if}
   

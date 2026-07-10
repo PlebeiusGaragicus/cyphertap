@@ -74,14 +74,12 @@ follow-ups:
   cypherflow — update once identity/rebrand is decided. Keep upstream's MIT
   license and attribution regardless.
 
-## 6b. Components are legacy-mode Svelte 5 (pre-runes)
+## 6b. Components are legacy-mode Svelte 5 (pre-runes) — **RESOLVED 2026-07-10**
 
-Most components use `$:`/`export let` legacy syntax. New SvelteKit scaffolds
-force runes mode, which breaks compilation of linked packages unless the
-consumer adds an exception (documented in CONSUMING.md). Migrating the
-components to runes removes that consumer footgun and is the direction
-Svelte 6 forces anyway. Mechanical but touches most components — a good
-incremental migration.
+All components migrated to runes (`$props()`/`$derived`/`$effect`); no
+`$:`/`export let` remains under `src/lib`. Consumers no longer need the
+runes-mode exception in their Vite config (CONSUMING.md updated); the
+standard `node_modules` exclusion suffices.
 
 ## 7. svelte-motion is Svelte-4 era
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, onDestroy } from 'svelte';
+	import { onDestroy } from 'svelte';
 	import QRCode from '@castlenine/svelte-qrcode';
 
 	import {Accordion, AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
@@ -11,29 +11,31 @@
     import Snail from '@lucide/svelte/icons/snail';
     import Rabbit from '@lucide/svelte/icons/rabbit';
 
-	export let token: string | undefined;
-	export let size = 275;
-	export let padding = 4;
+	let {
+		token,
+		size = 275,
+		padding = 4
+	}: { token: string | undefined; size?: number; padding?: number } = $props();
 
 	// Animation state
-	let isAnimating = false;
-	let qrValue = '';
+	let isAnimating = $state(false);
+	let qrValue = $state('');
 	let frameCounter = 0;
 	let totalFragments = 0;
-	let progress = 0;
+	let progress = $state(0);
 	let intervalId: ReturnType<typeof setInterval> | null = null;
 	let urEncoder: any = null;
 
 	// Animation settings
 	type AnimationSpeed = 'slow' | 'fast';
-	let animationSpeed: AnimationSpeed = 'fast';
+	let animationSpeed: AnimationSpeed = $state('fast');
 	const speedValues = {
 		slow: 400,
 		fast: 200
 	};
 
 	type QRDensity = 'simple' | 'detailed';
-	let qrDensity: QRDensity = 'detailed';
+	let qrDensity: QRDensity = $state('detailed');
 	const densityValues = {
 		simple: 60, // Simpler QR code with less information per frame
 		detailed: 100 // More detailed QR code with more information per frame
@@ -124,12 +126,9 @@
 		}
 	}
 
-	// Initialize animation when token is available
-	$: if (token) {
-		setupUREncoder();
-	}
-
-	onMount(() => {
+	// Initialize animation when token becomes available or changes. (Replaces
+	// the legacy `$:` block plus a redundant onMount that double-fired setup.)
+	$effect(() => {
 		if (token) {
 			setupUREncoder();
 		}

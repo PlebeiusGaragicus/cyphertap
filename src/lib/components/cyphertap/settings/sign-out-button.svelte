@@ -12,12 +12,18 @@
 	import Button from '$lib/components/ui/button/button.svelte';
 	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
 
-	export let variant: 'outline' | 'default' | 'destructive' = 'outline';
-	export let size: 'sm' | 'default' | 'lg' | 'icon' = 'sm';
-	export let className = 'w-full justify-start text-destructive hover:text-destructive';
+	let {
+		variant = 'outline',
+		size = 'sm',
+		className = 'w-full justify-start text-destructive hover:text-destructive'
+	}: {
+		variant?: 'outline' | 'default' | 'destructive';
+		size?: 'sm' | 'default' | 'lg' | 'icon';
+		className?: string;
+	} = $props();
 
 	// Track clear database option
-	let clearDatabase = true;
+	let clearDatabase = $state(true);
 
 	// Handle the logout confirmation
 	async function handleConfirmLogout() {

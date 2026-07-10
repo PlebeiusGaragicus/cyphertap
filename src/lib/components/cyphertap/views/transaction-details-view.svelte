@@ -21,15 +21,15 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
     import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js'
 
-	// Props for transaction details
+	// Props for transaction details (read once from navigation context)
 	let tx: NDKCashuWalletTx = $context.tx!;
 	let transaction = formatTransaction(tx);
-	let canReclaim = false;
+	let canReclaim = $state(false);
 	let nanoId: string | undefined;
-	let isReclaiming = false;
-	let reclaimError: string | null = null;
-	let reclaimSuccess = false;
-	let shouldShowButton = true;
+	let isReclaiming = $state(false);
+	let reclaimError: string | null = $state(null);
+	let reclaimSuccess = $state(false);
+	let shouldShowButton = $state(true);
 
 	// Check if this transaction can be reclaimed
 	async function checkReclaimStatus() {
@@ -79,7 +79,7 @@
 	}
 
 	// Get display-friendly description
-	$: displayDescription = formatTransactionDescription(transaction?.description || '');
+	const displayDescription = $derived(formatTransactionDescription(transaction?.description || ''));
 </script>
 
 <ViewContainer className="p-4">

@@ -1,23 +1,32 @@
 <!-- src/lib/components/ui/ViewContainer.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { fly } from 'svelte/transition';
 	import { startTransition, endTransition, direction } from '$lib/stores/navigation.js';
 
-	// Allow passing additional classes
-	export let className = '';
-	// Allow customizing animation options
-	export let animationDuration = 300;
-	export let animationDistance = 300;
+	let {
+		// Allow passing additional classes
+		className = '',
+		// Allow customizing animation options
+		animationDuration = 300,
+		animationDistance = 300,
+		children
+	}: {
+		className?: string;
+		animationDuration?: number;
+		animationDistance?: number;
+		children?: Snippet;
+	} = $props();
 </script>
 
 <div
 	class="w-full {className}"
 	in:fly={{ x: $direction * animationDistance, duration: animationDuration }}
 	out:fly={{ x: $direction * -animationDistance, duration: animationDuration }}
-	on:introstart={startTransition}
-	on:outrostart={startTransition}
-	on:introend={endTransition}
-	on:outroend={endTransition}
+	onintrostart={startTransition}
+	onoutrostart={startTransition}
+	onintroend={endTransition}
+	onoutroend={endTransition}
 >
-	<slot />
+	{@render children?.()}
 </div>

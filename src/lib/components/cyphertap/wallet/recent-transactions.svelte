@@ -16,7 +16,7 @@
 	import { formatTransactionDescription } from '$lib/utils/tx.js';
 	import Button from '$lib/components/ui/button/button.svelte';
 	// Props
-	export let limit: number = 3;
+	let { limit = 3 }: { limit?: number } = $props();
 	// Format the timestamp for display
 	function formatTime(timestamp: number): string {
 		if (!timestamp) return 'Unknown time';
@@ -27,7 +27,7 @@
 		}
 	}
 	// Get recent transactions based on the limit
-	$: recentTransactions = $walletTransactions.slice(0, limit);
+	const recentTransactions = $derived($walletTransactions.slice(0, limit));
 </script>
 
 <div class="space-y-2">

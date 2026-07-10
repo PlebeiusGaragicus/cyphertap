@@ -29,29 +29,29 @@
 	import LnQrCode from '../wallet/ln-qr-code.svelte';
 
 	// Common state
-	let activeTab = 'lightning';
-	let error: string | undefined;
+	let activeTab = $state('lightning');
+	let error: string | undefined = $state();
 
 	// Lightning state
-	let amount = '100';
-	let isProcessing = false;
-	let isLoading = false;
-	let bolt11: string | undefined;
-	let isPaymentReceived = false;
+	let amount = $state('100');
+	let isProcessing = $state(false);
+	let isLoading = $state(false);
+	let bolt11: string | undefined = $state();
+	let isPaymentReceived = $state(false);
 
 	// Token state
-	let tokenInput = '';
-	let isReceivingToken = false;
-	let isTokenReceived = false;
-	let receivedAmount: number | undefined;
-	let isTokenDecoded = false;
+	let tokenInput = $state('');
+	let isReceivingToken = $state(false);
+	let isTokenReceived = $state(false);
+	let receivedAmount: number | undefined = $state();
+	let isTokenDecoded = $state(false);
 	let decodedToken: {
 		mint: string;
 		amount: number;
 		memo?: string;
 		isTrustedMint: boolean;
-	} | null = null;
-	let isAddingMint = false;
+	} | null = $state(null);
+	let isAddingMint = $state(false);
 
 	// Clipboard state
 	let canPasteFromClipboard =
@@ -251,11 +251,13 @@
 		decodedToken = null;
 	}
 
-	$: if (tokenInput) {
-		decodeToken(tokenInput);
-	} else {
-		clearDecodedInfo();
-	}
+	$effect(() => {
+		if (tokenInput) {
+			decodeToken(tokenInput);
+		} else {
+			clearDecodedInfo();
+		}
+	});
 
 	// Check for scanned token on mount
 	onMount(() => {

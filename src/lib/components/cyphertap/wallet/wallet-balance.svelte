@@ -3,7 +3,7 @@
 	import { walletBalance, isWalletReady } from '$lib/stores/wallet.js';
     import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 
-	export let compact = false;
+	let { compact = false }: { compact?: boolean } = $props();
 </script>
 
 <div class={compact ? 'text-sm text-muted-foreground' : 'text-3xl font-bold'}>

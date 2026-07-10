@@ -8,13 +8,13 @@
 	import Separator from '$lib/components/ui/separator/separator.svelte';
 	import MintListItem from './mint-list-item.svelte';
 
-	let mintUrl = '';
-	let isProcessing = false;
-	let error: string | null = null;
+	let mintUrl = $state('');
+	let isProcessing = $state(false);
+	let error: string | null = $state(null);
 
 	// Derived property to count different mint types
-	$: registeredMints = $mintInfo.filter((mint) => mint.isRegistered);
-	$: unregisteredMints = $mintInfo.filter((mint) => !mint.isRegistered);
+	const registeredMints = $derived($mintInfo.filter((mint) => mint.isRegistered));
+	const unregisteredMints = $derived($mintInfo.filter((mint) => !mint.isRegistered));
 
 	async function handleAddMint() {
 		if (!mintUrl.trim()) return;

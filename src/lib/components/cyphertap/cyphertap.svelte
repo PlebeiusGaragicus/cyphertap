@@ -18,19 +18,23 @@
 
 	// Library configuration (see stores/config.ts). Applied in the script
 	// body so it lands before onMount's autoLogin.
-	export let relays: string[] | undefined = undefined;
-	export let mints: string[] | undefined = undefined;
+	let { relays, mints }: { relays?: string[]; mints?: string[] } = $props();
+	// svelte-ignore state_referenced_locally -- initial values only, by design:
+	// config is read at login, so prop changes apply on the next login.
 	configure({ relays, mints });
 
 	// MediaQuery touches window.matchMedia in its constructor, and the whole
 	// widget is browser-only anyway — during SSR we render a placeholder shell
 	// (see markup) so consumers don't need ssr=false.
 	const isDesktop = BROWSER ? new MediaQuery('(min-width: 768px)').current : true;
+
 	// When popover opens, reset current view
-	$: if ($isUserMenuOpen) {
-		initNavigation();
-		openMenu();
-	}
+	$effect(() => {
+		if ($isUserMenuOpen) {
+			initNavigation();
+			openMenu();
+		}
+	});
 
 	// Try auto login
 	onMount(() => {

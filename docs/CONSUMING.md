@@ -56,22 +56,15 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
    renders a placeholder trigger server-side, hydrating into the real widget.
    `ssr = false` still works if you prefer a fully client-rendered app.
 
-3. **Runes-mode exception** — new SvelteKit scaffolds force
-   `compilerOptions.runes: true` for non-`node_modules` files. Workspace- and
-   submodule-linked packages resolve through their symlink to a real path
-   without a `node_modules` segment, so cyphertap (legacy-mode Svelte 5) gets
-   runes-compiled and fails. Extend the scaffold's check to treat anything
-   outside the app dir as a library:
+3. ~~Runes-mode exception~~ — no longer required: the library is fully
+   runes-mode Svelte 5, so scaffolds that force `compilerOptions.runes: true`
+   compile it fine. Keep the standard `node_modules` exclusion for third-party
+   Svelte libraries:
 
    ```ts
    runes: ({ filename }) =>
-       filename.split(/[/\\]/).includes('node_modules') ||
-       !filename.startsWith(import.meta.dirname)
-           ? undefined
-           : true
+       filename.split(/[/\\]/).includes('node_modules') ? undefined : true
    ```
-
-   (Goes away when the library itself migrates to runes — see TECH-DEBT.)
 
 4. **Relays and mints**: pass props (or call `configure()` before mounting).
    Defaults are cypherflow.ai infrastructure — production apps should set

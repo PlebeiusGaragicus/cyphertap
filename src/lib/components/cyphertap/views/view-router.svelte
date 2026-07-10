@@ -16,9 +16,12 @@
 	import TransactionHistoryView from './transaction-history-view.svelte';
 	import OnboardingView from './onboarding-view.svelte';
 	import { loadNegentropy } from '$lib/utils/negentropy.js';
-	
-	export let isDesktop = new MediaQuery('(min-width: 768px)').current;
-	export let fullScreen = false;
+	import { BROWSER } from 'esm-env';
+
+	let {
+		isDesktop = BROWSER ? new MediaQuery('(min-width: 768px)').current : true,
+		fullScreen = false
+	}: { isDesktop?: boolean; fullScreen?: boolean } = $props();
 
 
 	initNavigation();
@@ -45,11 +48,11 @@
 <!-- Different wrapper based on container type -->
 {#if isDesktop}
 	<!-- For popover: original adaptive height behavior -->
-	<div class={`min-h-32 border border-yellow-500 ${$inTransition ? 'relative' : 'h-full '}`}>
+	<div class={`min-h-32 ${$inTransition ? 'relative' : 'h-full '}`}>
 		{#each Object.entries(viewComponents) as [name, Component]}
 			{#if $currentView === name}
 				<div class={$inTransition ? 'absolute inset-0' : ''}>
-					<svelte:component this={Component} />
+					<Component />
 				</div>
 			{/if}
 		{/each}
@@ -63,7 +66,7 @@
 					{#if $currentView === name}
 						<!-- Fixed top position when in drawer -->
 						<div class={$inTransition ? 'absolute inset-0' : ''}>
-							<svelte:component this={Component} />
+							<Component />
 						</div>
 					{/if}
 				{/each}
@@ -80,7 +83,7 @@
 					{#if $currentView === name}
 						<!-- Fixed top position when in drawer -->
 						<div class={$inTransition ? 'absolute inset-0' : ''}>
-							<svelte:component this={Component} />
+							<Component />
 						</div>
 					{/if}
 				{/each}

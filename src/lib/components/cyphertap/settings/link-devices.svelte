@@ -13,15 +13,16 @@
     import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone';
 
 	// State variables
-	let pin = '';
-	let qrData = '';
-	let isGenerating = false;
-	let privateKey = '';
+	let pin = $state('');
+	let qrData = $state('');
+	let isGenerating = $state(false);
 
-	// Get private key from NDK signer if available
-	$: if ($ndkInstance?.signer instanceof NDKPrivateKeySigner) {
-		privateKey = $ndkInstance.signer.privateKey || '';
-	}
+	// Private key from the NDK signer, if it is a local-key signer
+	const privateKey = $derived(
+		$ndkInstance?.signer instanceof NDKPrivateKeySigner
+			? $ndkInstance.signer.privateKey || ''
+			: ''
+	);
 
 	// Generate link data
 	function generateLinkData() {

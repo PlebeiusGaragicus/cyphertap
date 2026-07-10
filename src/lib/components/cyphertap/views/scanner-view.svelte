@@ -20,7 +20,7 @@
 		window.isSecureContext;
 
 	// Get context-specific instruction text
-	$: instructionText = getInstructionText($context.sourceView);
+	const instructionText = $derived(getInstructionText($context.sourceView));
 
 	// Set instructions from source view
 	function getInstructionText(sourceView: ViewName): string {

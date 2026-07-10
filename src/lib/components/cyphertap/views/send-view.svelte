@@ -37,27 +37,27 @@
 
 
 	// Common state
-	let activeTab = 'lightning';
-	let error: string | undefined;
+	let activeTab = $state('lightning');
+	let error: string | undefined = $state();
 	// Lightning state
-	let lnInvoice = '';
-	let isSendingLn = false;
-	let isLnPaymentSent = false;
+	let lnInvoice = $state('');
+	let isSendingLn = $state(false);
+	let isLnPaymentSent = $state(false);
 
 	// Lightning fee reserve
 	const LIGHTNING_FEE_RESERVE = 3; // 3 sats minimum fee reserve
 
 	// Decoded invoice info
-	let decodedAmount: number | undefined;
-	let decodedDescription: string | undefined;
-	let isExpired = false;
+	let decodedAmount: number | undefined = $state();
+	let decodedDescription: string | undefined = $state();
+	let isExpired = $state(false);
 
 	// Token state
-	let tokenAmount = '100';
-	let isGeneratingToken = false;
-	let isTokenGenerated = false;
-	let generatedToken: string | undefined;
-	let tokenMint: string | undefined;
+	let tokenAmount = $state('100');
+	let isGeneratingToken = $state(false);
+	let isTokenGenerated = $state(false);
+	let generatedToken: string | undefined = $state();
+	let tokenMint: string | undefined = $state();
 
 	// Clipboard state
 	let canPasteFromClipboard =
@@ -114,17 +114,19 @@
 	}
 
 	// Watch for changes to the invoice and decode it
-	$: if (lnInvoice) {
-		decodeInvoice();
-	} else {
-		clearDecodedInfo();
-	}
+	$effect(() => {
+		if (lnInvoice) {
+			decodeInvoice();
+		} else {
+			clearDecodedInfo();
+		}
+	});
 
 	// Calculate total amount needed (payment + fee reserve)
-	$: totalAmountNeeded = decodedAmount ? decodedAmount + LIGHTNING_FEE_RESERVE : 0;
+	const totalAmountNeeded = $derived(decodedAmount ? decodedAmount + LIGHTNING_FEE_RESERVE : 0);
 
 	// Check if we have enough balance for payment + fee reserve
-	$: hasEnoughBalanceForLn = totalAmountNeeded <= $walletBalance;
+	const hasEnoughBalanceForLn = $derived(totalAmountNeeded <= $walletBalance);
 
 	async function handleSendLightning() {
 		if (!$wallet || !lnInvoice) return;

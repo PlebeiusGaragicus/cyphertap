@@ -24,16 +24,19 @@
 	import Badge from '$lib/components/ui/badge/badge.svelte';
 	import DropdownMenuItem from '$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte';
 
-	export let mint: {
-		url: string;
-		balance: number;
-		isMain: boolean;
-		isRegistered: boolean;
-	};
+	let {
+		mint
+	}: {
+		mint: {
+			url: string;
+			balance: number;
+			isMain: boolean;
+			isRegistered: boolean;
+		};
+	} = $props();
 
-	let showConfirmDialog = false;
-	let isProcessing = false;
-	let error: string | null = null;
+	let showConfirmDialog = $state(false);
+	let isProcessing = $state(false);
 
 	async function handleRemove() {
 		try {

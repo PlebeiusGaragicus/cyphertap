@@ -6,11 +6,15 @@
     import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import Button from '$lib/components/ui/button/button.svelte';
 
-	export let relay: {
-		url: string;
-		connected: boolean;
-		status: number;
-	};
+	let {
+		relay
+	}: {
+		relay: {
+			url: string;
+			connected: boolean;
+			status: number;
+		};
+	} = $props();
 
 	async function handleRemove() {
 		try {

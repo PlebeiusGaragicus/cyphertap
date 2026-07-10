@@ -11,19 +11,17 @@
     import Key from '@lucide/svelte/icons/key';
 	import Button from '$lib/components/ui/button/button.svelte';
 
-	let showPrivateKey = false;
-	let privateKey = '';
-	let npub = '';
+	let showPrivateKey = $state(false);
 
-	// Fetch the pubkey from current user
-	$: if ($currentUser) {
-		npub = $currentUser.npub || '';
-	}
+	// Pubkey from the current user
+	const npub = $derived($currentUser?.npub || '');
 
-	// Get private key from NDK signer if available
-	$: if ($ndkInstance?.signer instanceof NDKPrivateKeySigner) {
-		privateKey = $ndkInstance.signer.privateKey || '';
-	}
+	// Private key from the NDK signer, if it is a local-key signer
+	const privateKey = $derived(
+		$ndkInstance?.signer instanceof NDKPrivateKeySigner
+			? $ndkInstance.signer.privateKey || ''
+			: ''
+	);
 
 	function togglePrivateKeyVisibility() {
 		showPrivateKey = !showPrivateKey;
