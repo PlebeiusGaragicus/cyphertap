@@ -142,12 +142,15 @@ export class CyphertapAPI {
         paymentDescription: memo || `${amount} sats token`
       };
       const result = await currentWallet.cashuPay(paymentInfo);
+      if (!result?.mint || !result.proofs?.length) {
+        throw new Error('No proofs returned by wallet');
+      }
       const token = getEncodedTokenV4({
-        mint: result?.mint,
-        proofs: result?.proofs,
+        mint: result.mint,
+        proofs: result.proofs,
         memo
       });
-      return { token, mint: result?.mint };
+      return { token, mint: result.mint };
     } catch (error) {
       throw new Error(`Token generation failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
@@ -191,10 +194,10 @@ export class CyphertapAPI {
     
     const ndkEvent = new NDKEvent(ndk, event);
     await ndkEvent.publish();
-    
+
     return {
-      id: event.id || '',
-      pubkey: event.pubkey || ''
+      id: ndkEvent.id || '',
+      pubkey: ndkEvent.pubkey || ''
     };
   }
 
@@ -220,13 +223,13 @@ export class CyphertapAPI {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
     
-    let ndkEvent = new NDKEvent(ndk, event);
+    const ndkEvent = new NDKEvent(ndk, event);
     await ndkEvent.sign();
-    
+
     return {
-      id: event.id || '',
-      pubkey: event.pubkey || '',
-      signature: event.sig || ''
+      id: ndkEvent.id || '',
+      pubkey: ndkEvent.pubkey || '',
+      signature: ndkEvent.sig || ''
     };
   }
 
