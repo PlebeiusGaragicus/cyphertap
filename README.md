@@ -4,14 +4,23 @@
 
 Stop reinventing the wheel for every Nostr app. CypherTap gives you a complete authentication and payment solution with both a ready-to-use UI component and a comprehensive programmatic API - drop it in your Svelte app and you're done.
 
-Follow me on [Nostr](https://njump.me/npub1strjxxh7fzhrvgkraew4fpt6ppu973sc3p9cm2mehl0naq22hars007wsf) to see me build this library and other stuff live on stream.
-[![NPM Version](https://img.shields.io/npm/v/cyphertap)](https://www.npmjs.com/package/cyphertap)
-[![License](https://img.shields.io/npm/l/cyphertap)](https://github.com/cypherflow/cyphertap/blob/main/LICENSE)
+> This is a maintained fork of [cypherflow/cyphertap](https://github.com/cypherflow/cyphertap).
+> It is **not published to npm** — apps embed it as a git submodule or workspace
+> package and consume it from source. See [docs/CONSUMING.md](docs/CONSUMING.md).
+> Theming: [docs/THEMING.md](docs/THEMING.md). Known debt: [docs/TECH-DEBT.md](docs/TECH-DEBT.md).
 
-> **⚠️ EXPERIMENTAL SOFTWARE**: CypherTap is in beta and experimental. Private keys from newly created accounts or nsec imports are currently stored **unencrypted** in browser localStorage. Use at your own risk and never store more sats than you're willing to lose. Only use new keypairs or import your nsec if you understand the security implications.
-
-
-## 🚀 [Live Demo](https://cypherflow.github.io/cyphertap/)  
+> **⚠️ HOT KEYS — READ BEFORE USING**
+>
+> Private keys created in or imported into CypherTap are stored as **raw
+> unencrypted hex in browser localStorage** — under a storage key misleadingly
+> named `ENCRYPTED_KEY` (it is *not* encrypted). Any XSS or malicious browser
+> extension can read it. A working NIP-49 encryption module exists in the repo
+> (`src/lib/utils/nip49.ts`, used for device linking) but is **not wired** to
+> at-rest key storage — that trade-off is deliberate for now (see TECH-DEBT #1).
+>
+> Treat wallets here as **pocket money**: never more sats than you'd carry as
+> cash, never a key that holds your identity. Prefer NIP-07 extension login
+> (keys never leave the extension) for anything that matters.
 
 ## Overview
 
@@ -28,29 +37,36 @@ CypherTap is a **drop-in Svelte component** that gives your application:
 
 ### Installation
 
-```bash
-npm install cyphertap
-# or
-pnpm add cyphertap
-# or
-yarn add cyphertap
+Not on npm — embed the repo (git submodule or pnpm workspace package) and
+depend on the directory. Full pattern, including the required NDK version
+override: [docs/CONSUMING.md](docs/CONSUMING.md).
+
+```json
+"dependencies": { "cyphertap": "workspace:*" }
 ```
 
 ### Basic Usage
 
 #### 1. Component API (Simplest)
 
-Just drop the component into your app:
+Import the styles once in your root layout, then drop the component in:
 
 ```svelte
 <script lang="ts">
+  // +layout.svelte
+  import 'cyphertap/styles.css';
   import { Cyphertap } from 'cyphertap';
 </script>
 
-<Cyphertap />
+<Cyphertap
+  relays={['wss://relay.damus.io', 'wss://nos.lol']}
+  mints={['https://mint.example.com']}
+/>
 ```
 
-That's it! The button handles everything - login, wallet management, sending/receiving payments.
+The button handles everything — login, wallet management, sending/receiving
+payments. `relays`/`mints` are optional but production apps should set them:
+the defaults point at cypherflow.ai infrastructure.
 
 #### 2. Programmatic API (Advanced)
 
@@ -138,13 +154,27 @@ const signed = await cyphertap.signEvent({
   content: 'This will be signed but not published'
 });
 
+// Publish an addressable event (kind 3xxxx + d tag), e.g. a NIP-38 status
+await cyphertap.publishAddressable(30315, 'general', 'building cyphertap', [
+  ['expiration', String(Math.floor(Date.now() / 1000) + 3600)]
+]);
+
 // Subscribe to events
 const unsubscribe = cyphertap.subscribe(
   { kinds: [1], authors: [userPubkey] },
   (event) => console.log('New event:', event)
 );
 
-// Encrypt/decrypt messages (NIP-04)
+// Subscribe keeping only the newest version per replaceable/addressable key
+const stop = cyphertap.subscribeLatest(
+  { kinds: [30315], authors: follows, '#d': ['general'] },
+  (event) => console.log('Status update:', event.pubkey, event.content)
+);
+
+// Pubkeys from the logged-in user's contact list (kind 3)
+const follows = await cyphertap.getFollows();
+
+// Encrypt/decrypt messages (NIP-44)
 const encrypted = await cyphertap.encrypt('Secret message', recipientPubkey);
 const decrypted = await cyphertap.decrypt(encrypted, senderPubkey);
 ```
@@ -251,7 +281,7 @@ CypherTap uses Tailwind CSS and shadcn-svelte components. You can customize the 
 CypherTap implements several Nostr Improvement Proposals (NIPs):
 
 - **NIP-01**: Basic protocol
-- **NIP-04**: Encrypted Direct Messages
+- **NIP-44**: Encrypted payloads (the `encrypt`/`decrypt` API)
 - **NIP-07**: Browser extension signing
 - **NIP-49**: Private key encryption for device linking
 - **NIP-60**: Cashu wallet events
@@ -351,10 +381,14 @@ npm run build
 ### Component
 
 ```svelte
-<Cyphertap />
+<Cyphertap relays={['wss://...']} mints={['https://...']} />
 ```
 
-No props required - the component manages all state internally.
+Both props are optional (defaults: cypherflow.ai infrastructure). Config is
+read at login; changing props afterwards applies on the next login. Mints
+only apply when a NEW NIP-60 wallet is created — an existing wallet keeps
+the mint list from its own wallet event. For non-component setups, call
+`configure({ relays, mints })` before mounting.
 
 ### Programmatic API
 
@@ -383,10 +417,14 @@ No props required - the component manages all state internally.
 **Nostr**
 - `publishTextNote(content: string): Promise<{ id: string; pubkey: string }>`
 - `publishEvent(event: Partial<NDKRawEvent>): Promise<{ id: string; pubkey: string }>`
+- `publishAddressable(kind: number, dTag: string, content: string, tags?: string[][]): Promise<{ id: string; pubkey: string }>`
 - `signEvent(event: Partial<NDKRawEvent>): Promise<{ id: string; pubkey: string; signature: string }>`
-- `subscribe(filter: NDKFilter, callback: Function): () => void`
-- `encrypt(content: string, recipientPubkey: string): Promise<string>`
-- `decrypt(encryptedContent: string, senderPubkey: string): Promise<string>`
+- `subscribe(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void`
+- `subscribeLatest(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void` — newest-per-key dedup for replaceable/addressable kinds
+- `getFollows(): Promise<string[]>` — hex pubkeys from the user's kind-3 contact list
+- `encrypt(content: string, recipientPubkey: string): Promise<string>` (NIP-44)
+- `decrypt(encryptedContent: string, senderPubkey: string): Promise<string>` (NIP-44)
+- `getNDK(): NDKSvelte` — escape hatch for power users; throws before login, couples you to the library's NDK version
 
 ## Contributing
 

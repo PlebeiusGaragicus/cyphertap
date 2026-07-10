@@ -5,7 +5,12 @@ Status snapshot (2026-07-10): `svelte-check` 0 errors / 0 warnings; `pnpm build`
 pnpm-workspace.yaml override. Items below are what remains, roughly in
 priority order. Items marked **DECISION** need a product call before code.
 
-## 1. Private key stored unencrypted in localStorage — **DECISION**
+## 1. Private key stored unencrypted in localStorage — **DECIDED 2026-07-10: document and defer**
+
+Keys stay hot for now; the README carries a prominent warning (misleading
+`ENCRYPTED_KEY` name, pocket-money amounts, NIP-49 module exists unwired).
+Revisit encryption-at-rest when the product needs it — the options analysis
+below stands.
 
 `storePrivateKey()` in `src/lib/stores/nostr.ts` writes the raw hex nsec to
 localStorage under a constant misleadingly named `ENCRYPTED_KEY`. Any XSS or
@@ -25,16 +30,16 @@ UX: encrypting at rest means auto-login can no longer be silent. Options:
 - **Document and defer**: keep as-is; state plainly in the README that keys
   are hot and the wallet is for pocket-money amounts.
 
-## 2. Test suite is a placeholder
+## 2. Test suite is a placeholder — **MOSTLY RESOLVED 2026-07-10**
 
-One demo test (`src/demo.spec.ts`). Highest-value coverage to add first:
+API contract tests landed (`src/lib/api/cyphertap-api.spec.ts`,
+`src/lib/utils/latest.spec.ts`): publish error-handling contract
+(NDKPublishError tolerated, everything else rethrown), publishAddressable
+d-tag shape, subscribeLatest dedup + options, NIP-44/sign round-trips with
+real crypto, generateEcashToken encode/guard path. Still open:
 
 - `src/lib/utils/nip49.ts` — pure crypto, easy to test, catastrophic if wrong
   (NIP-49 spec has test vectors; nostr-tools' nip49 tests are a reference).
-- `CyphertapAPI` publish/sign/subscribe — the publish error-handling contract
-  (NDKPublishError tolerated, everything else rethrown) is exactly the kind
-  of behavior a refactor silently breaks.
-- Token encode/guard path in `generateEcashToken`.
 
 ## 3. `cashuPay` type casts
 
