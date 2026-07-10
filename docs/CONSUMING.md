@@ -52,13 +52,9 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
      "@nostr-dev-kit/ndk": 2.14.33
    ```
 
-2. **Disable SSR** on routes that render the component (it needs
-   localStorage/IndexedDB/WebSocket):
-
-   ```ts
-   // +layout.ts
-   export const ssr = false;
-   ```
+2. ~~Disable SSR~~ — no longer required: `<Cyphertap/>` is SSR-safe and
+   renders a placeholder trigger server-side, hydrating into the real widget.
+   `ssr = false` still works if you prefer a fully client-rendered app.
 
 3. **Runes-mode exception** — new SvelteKit scaffolds force
    `compilerOptions.runes: true` for non-`node_modules` files. Workspace- and
