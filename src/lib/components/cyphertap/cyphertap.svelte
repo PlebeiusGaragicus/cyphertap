@@ -12,6 +12,7 @@
 
 	import { Drawer, DrawerTrigger, DrawerContent }  from '$lib/components/ui/drawer/index.js';
 	import { onMount } from 'svelte';
+	import { BROWSER } from 'esm-env';
 	import { autoLogin } from '$lib/stores/nostr.js';
 	import { configure } from '$lib/stores/config.js';
 
@@ -21,7 +22,10 @@
 	export let mints: string[] | undefined = undefined;
 	configure({ relays, mints });
 
-	const isDesktop = new MediaQuery('(min-width: 768px)').current;
+	// MediaQuery touches window.matchMedia in its constructor, and the whole
+	// widget is browser-only anyway — during SSR we render a placeholder shell
+	// (see markup) so consumers don't need ssr=false.
+	const isDesktop = BROWSER ? new MediaQuery('(min-width: 768px)').current : true;
 	// When popover opens, reset current view
 	$: if ($isUserMenuOpen) {
 		initNavigation();
@@ -34,7 +38,12 @@
 	})
 </script>
 
-{#if isDesktop}
+{#if !BROWSER}
+	<!-- SSR placeholder: same footprint as the trigger, hydrates into the real widget -->
+	<div class="relative">
+		<CyphertapTrigger />
+	</div>
+{:else if isDesktop}
 	<div class="relative">
 		<Popover bind:open={$isUserMenuOpen}>
 			<PopoverTrigger>
