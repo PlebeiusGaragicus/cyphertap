@@ -17,9 +17,19 @@ export interface CyphertapConfig {
 // Overridable at build time by the consuming Vite app (e.g. to point at a
 // local mint during development). The consumer's Vite build performs the
 // substitution. Layering: configure()/props > VITE env > hardcoded default.
+//
+// SAFETY: the default mint is a Cashu TEST mint — unbacked fake
+// ecash, fake Lightning backend (invoices auto-settle). No real funds can
+// flow until this is deliberately changed (decision: test-only until the
+// stack is thoroughly exercised). The default relay is our own whitelisted
+// strfry (see nostr-ecash-ecosystem .test-accounts.json for accounts it
+// accepts; unknown pubkeys are rejected with "blocked: pubkey not on
+// whitelist").
 const defaults: CyphertapConfig = {
-	relays: ['wss://relay.cypherflow.ai'],
-	mints: [import.meta.env.VITE_CASHU_MINT_URL || 'https://mint.cypherflow.ai']
+	relays: ['wss://relay.abvstudio.net'],
+	// nofee.testnut over testnut.cashu.space: the latter runs bleeding-edge
+	// cdk-mintd with v2 keyset IDs ('01…') that cashu-ts 2.9 can't verify.
+	mints: [import.meta.env.VITE_CASHU_MINT_URL || 'https://nofee.testnut.cashu.space']
 };
 
 const config: CyphertapConfig = { ...defaults, relays: [...defaults.relays], mints: [...defaults.mints] };

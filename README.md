@@ -68,7 +68,8 @@ Import the styles once in your root layout, then drop the component in:
 
 The button handles everything — login, wallet management, sending/receiving
 payments. `relays`/`mints` are optional but production apps should set them:
-the defaults point at cypherflow.ai infrastructure.
+the defaults are TEST infrastructure: a whitelisted private relay and the
+feeless testnut mint (fake ecash, no real funds).
 
 #### 2. Programmatic API (Advanced)
 
@@ -264,7 +265,10 @@ The CypherTap button component includes:
 
 ### Default Mints
 
-By default, CypherTap uses `https://mint.cypherflow.ai`. Users can add additional mints through the settings interface. Mint selection view will be added to the onboarding process soon.
+By default, CypherTap uses `https://nofee.testnut.cashu.space` — a TEST mint
+issuing unbacked fake ecash (its Lightning backend auto-settles invoices).
+No real funds can flow until this default is deliberately changed. Users can
+add additional mints through the settings interface.
 
 ### Relay Configuration
 
@@ -386,7 +390,8 @@ npm run build
 <Cyphertap relays={['wss://...']} mints={['https://...']} />
 ```
 
-Both props are optional (defaults: cypherflow.ai infrastructure). Config is
+Both props are optional (defaults: whitelisted test relay + testnut fake
+mint — no real funds). Config is
 read at login; changing props afterwards applies on the next login. Mints
 only apply when a NEW NIP-60 wallet is created — an existing wallet keeps
 the mint list from its own wallet event. For non-component setups, call

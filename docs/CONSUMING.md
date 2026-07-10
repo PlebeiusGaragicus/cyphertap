@@ -65,8 +65,9 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
    ```
 
 4. **Relays and mints**: pass props (or call `configure()` before mounting).
-   Defaults are cypherflow.ai infrastructure — production apps should set
-   their own. Layering: props/`configure()` > `VITE_CASHU_MINT_URL` env >
+   Defaults are TEST infrastructure (our whitelisted strfry relay
+   `wss://relay.abvstudio.net` + the `nofee.testnut.cashu.space` fake-ecash
+   mint — no real funds) — production apps must set their own. Layering: props/`configure()` > `VITE_CASHU_MINT_URL` env >
    hardcoded default. Note: mints only apply when a NEW NIP-60 wallet is
    created — an existing wallet keeps the mint list from its own wallet
    event. Config changes after login apply on the next login.
