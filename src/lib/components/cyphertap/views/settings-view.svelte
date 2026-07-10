@@ -1,12 +1,12 @@
 <!-- src/lib/components/nostr/NostrSettingsView.svelte -->
 <script lang="ts">
 	import { mode, setMode } from 'mode-watcher';
-	import { navigateTo } from '$lib/stores/navigation.js'
+	import { navigateTo } from '../../../stores/navigation.js'
 
-	import { Accordion }  from '$lib/components/ui/accordion/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import Switch from '$lib/components/ui/switch/switch.svelte';
+	import { Accordion }  from '../../ui/accordion/index.js';
+	import Button from '../../ui/button/button.svelte';
+	import ScrollArea from '../../ui/scroll-area/scroll-area.svelte';
+	import Switch from '../../ui/switch/switch.svelte';
     
 	import ViewContainer from './view-container.svelte';
 	import RelayManagement from '../settings/relay-management.svelte';

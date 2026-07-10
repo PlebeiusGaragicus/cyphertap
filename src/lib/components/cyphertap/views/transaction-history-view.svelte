@@ -2,16 +2,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { formatDistanceToNow } from 'date-fns';
-	import { navigateTo } from '$lib/stores/navigation.js';
-	import { formatTransactionDescription } from '$lib/utils/tx.js';
+	import { navigateTo } from '../../../stores/navigation.js';
+	import { formatTransactionDescription } from '../../../utils/tx.js';
 	import {
 		walletTransactions,
 		isLoadingTransactions,
 		wallet,
 		formatTransaction,
 		loadTransactionHistory
-	} from '$lib/stores/wallet.js';
-	import Button from '$lib/components/ui/button/button.svelte';
+	} from '../../../stores/wallet.js';
+	import Button from '../../ui/button/button.svelte';
 	import ViewContainer from './view-container.svelte';
 
     import ChevronLeft from '@lucide/svelte/icons/chevron-left';
@@ -19,10 +19,10 @@
     import ArrowDownLeft from '@lucide/svelte/icons/arrow-down-left';
     import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
     import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
+	import ScrollArea from '../../ui/scroll-area/scroll-area.svelte';
 
 	// Local state
-	let refreshing = false;
+	let refreshing = $state(false);
 	let retryCount = 0;
 	const MAX_RETRIES = 3;
 

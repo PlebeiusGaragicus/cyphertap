@@ -1,7 +1,7 @@
 <!-- src/lib/components/relay-management.svelte -->
 <script lang="ts">
     import Router from '@lucide/svelte/icons/router';
-	import { AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
+	import { AccordionItem, AccordionContent, AccordionTrigger}  from '../../ui/accordion/index.js';
 	import RelayList from './relay-list.svelte';
 </script>
 

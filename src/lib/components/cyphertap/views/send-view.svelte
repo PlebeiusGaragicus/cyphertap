@@ -8,16 +8,16 @@
 		getBolt11ExpiresAt
 	} from '@nostr-dev-kit/ndk-wallet';
 
-	import { wallet, walletBalance, sendLNPayment, generateToken } from '$lib/stores/wallet.js';
-	import { scanResult } from '$lib/stores/scan-store.js';
-	import { navigateTo } from '$lib/stores/navigation.js';
-	import { copyToClipboard, pasteFromClipboard } from '$lib/utils/clipboard.js';
+	import { wallet, walletBalance, sendLNPayment, generateToken } from '../../../stores/wallet.js';
+	import { scanResult } from '../../../stores/scan-store.js';
+	import { navigateTo } from '../../../stores/navigation.js';
+	import { copyToClipboard, pasteFromClipboard } from '../../../utils/clipboard.js';
 
 
-    import { Tabs, TabsList, TabsTrigger, TabsContent } from "$lib/components/ui/tabs/index.js";
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
+    import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs/index.js";
+	import { Button } from '../../ui/button/index.js';
+	import { Label } from '../../ui/label/index.js';
+	import { Input } from '../../ui/input/index.js';
 	import TokenQrCode from '../wallet/token-qr-code.svelte';
 	import ViewContainer from './view-container.svelte';
 

@@ -1,11 +1,11 @@
 <!-- src/lib/components/nostr/QRScannerView.svelte -->
 <script lang="ts">
 	import { toast } from 'svelte-sonner';
-	import { scanResult, identifyScanType } from '$lib/stores/scan-store.js';
-	import { navigateTo, context, type ViewName } from '$lib/stores/navigation.js';
-	import { pasteFromClipboard } from '$lib/utils/clipboard.js';
+	import { scanResult, identifyScanType } from '../../../stores/scan-store.js';
+	import { navigateTo, context, type ViewName } from '../../../stores/navigation.js';
+	import { pasteFromClipboard } from '../../../utils/clipboard.js';
 
-	import { Button } from '$lib/components/ui/button/index.js';
+	import { Button } from '../../ui/button/index.js';
 	import ViewContainer from './view-container.svelte';
 	import QrScanner from '../wallet/qr-scanner.svelte';
 

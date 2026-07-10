@@ -1,6 +1,6 @@
 <!-- src/lib/components/cyphertap/views/view-router.svelte -->
 <script lang="ts">
-	import { currentView, initNavigation, inTransition } from '$lib/stores/navigation.js';
+	import { currentView, initNavigation, inTransition } from '../../../stores/navigation.js';
 	import { MediaQuery } from 'svelte/reactivity';
 	import LoginGenerateKeyView from './login-generate-key-view.svelte';
 	import LoginLinkDeviceView from './login-link-device-view.svelte';
@@ -15,7 +15,7 @@
 	import TransactionDetailsView from './transaction-details-view.svelte';
 	import TransactionHistoryView from './transaction-history-view.svelte';
 	import OnboardingView from './onboarding-view.svelte';
-	import { loadNegentropy } from '$lib/utils/negentropy.js';
+	import { loadNegentropy } from '../../../utils/negentropy.js';
 	import { BROWSER } from 'esm-env';
 
 	let {

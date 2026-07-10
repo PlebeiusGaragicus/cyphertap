@@ -1,13 +1,13 @@
 <!-- src/lib/components/sync-list.svelte -->
 <script lang="ts">
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-    import { relays } from '$lib/stores/nostr.js';
+	import Button from '../../ui/button/button.svelte';
+	import Input from '../../ui/input/input.svelte';
+	import Separator from '../../ui/separator/separator.svelte';
+    import { relays } from '../../../stores/nostr.js';
 	import LoaderCircle from '@lucide/svelte/icons/loader-circle';
     import SyncListItem from './sync-list-item.svelte';
 	import Plus from '@lucide/svelte/icons/plus';
-	import { addWalletRelay } from '$lib/stores/wallet.js';
+	import { addWalletRelay } from '../../../stores/wallet.js';
 
     let { relaySyncs = $bindable()} = $props();
 

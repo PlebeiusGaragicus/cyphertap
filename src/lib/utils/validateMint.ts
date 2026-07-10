@@ -1,5 +1,5 @@
 // src/lib/client/utils/validateMint.ts
-import { wallet as walletStore } from '$lib/stores/wallet.js';
+import { wallet as walletStore } from '../stores/wallet.js';
 import { get } from 'svelte/store';
 
 /**

@@ -1,8 +1,8 @@
 // src/lib/client/services/unpublishedEvents.ts
 import { get } from 'svelte/store';
 import { BROWSER as browser } from 'esm-env';
-import { getNDK, relayConnectionStatus } from '$lib/stores/nostr.js';
-import { createDebug } from '$lib/utils/debug.js';
+import { getNDK, relayConnectionStatus } from '../stores/nostr.js';
+import { createDebug } from '../utils/debug.js';
 
 // Create debug logger
 const d = createDebug('unpublished-events');

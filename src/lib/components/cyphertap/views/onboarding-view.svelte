@@ -2,8 +2,8 @@
 <script lang="ts">
 	import ViewContainer from './view-container.svelte';
 	import OrbitingCyphertap from '../animations/orbiting-circles/orbiting-cyphertap.svelte';
-	import * as Card from '$lib/components/ui/card/index.js';
-	import * as Carousel from '$lib/components/ui/carousel/index.js';
+	import * as Card from '../../ui/card/index.js';
+	import * as Carousel from '../../ui/carousel/index.js';
 	import AnimatedBeamMultipleInputs from '../animations/animated-beam/animated-beam-multiple-inputs.svelte';
 	import AnimatedBeamUnidirection from '../animations/animated-beam/animated-beam-unidirection.svelte';
 </script>

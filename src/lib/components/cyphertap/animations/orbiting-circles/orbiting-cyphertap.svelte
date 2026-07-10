@@ -1,12 +1,11 @@
 <script lang="ts">
-	import '$lib/styles.css';
-	import { cn } from '$lib/utils.js';
+	import '../../../../styles.css';
+	import { cn } from '../../../../utils.js';
     import KeyRound from '@lucide/svelte/icons/key-round';
     import Waypoints from '@lucide/svelte/icons/waypoints'
     import Landmark from '@lucide/svelte/icons/landmark'
 	import OrbitingCircles from './orbiting-circles.svelte';
-	let className: any = '';
-	export { className as class };
+	let { class: className = '' }: { class?: string } = $props();
 </script>
 
 <div

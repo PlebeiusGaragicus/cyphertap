@@ -1,20 +1,20 @@
 <!-- src/lib/components/nostr/NostrPrivateKeyView.svelte -->
 <script lang="ts">
-	import { isConnecting, login } from '$lib/stores/nostr.js';
-	import { appState, InitStatus } from '$lib/services/init.svelte.js'
-	import { navigateTo } from '$lib/stores/navigation.js'
+	import { isConnecting, login } from '../../../stores/nostr.js';
+	import { appState, InitStatus } from '../../../services/init.svelte.js'
+	import { navigateTo } from '../../../stores/navigation.js'
 	import ViewContainer from './view-container.svelte'
 	import { slide } from 'svelte/transition';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
 	import CircleAlert from '@lucide/svelte/icons/circle-alert'
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left'
-	import Input from '$lib/components/ui/input/input.svelte';
-    import { Alert, AlertTitle, AlertDescription } from "$lib/components/ui/alert/index.js";
+	import Input from '../../ui/input/input.svelte';
+    import { Alert, AlertTitle, AlertDescription } from "../../ui/alert/index.js";
 
 
-	let privateKey = '';
-	let errorMessage = '';
-	let securityWarningAccepted = false;
+	let privateKey = $state('');
+	let errorMessage = $state('');
+	let securityWarningAccepted = $state(false);
 
 	async function handlePrivateKeyLogin(event: SubmitEvent) {
 		// Prevent the default form submission behavior

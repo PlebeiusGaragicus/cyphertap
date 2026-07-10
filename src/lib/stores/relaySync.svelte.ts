@@ -1,8 +1,8 @@
 // src/lib/stores/relaySync.svelte.ts
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from '../utils/debug.js';
 import { getNDK } from './nostr.js';
-import { performMultiFilterNegentropySync, type FilterWithEvents } from '$lib/utils/negentropyWebSocket.js';
-import type { RelaySyncState, FilterSyncResult, SyncResult } from '$lib/types/negentropy.js';
+import { performMultiFilterNegentropySync, type FilterWithEvents } from '../utils/negentropyWebSocket.js';
+import type { RelaySyncState, FilterSyncResult, SyncResult } from '../types/negentropy.js';
 import { 
     NDKSubscriptionCacheUsage, 
     type NDKEvent, 

@@ -7,9 +7,9 @@ import {
   currentUser,
   autoLogin,
   EXTENSION_LOGIN
-} from '$lib/stores/nostr.js';
-import { initWallet } from '$lib/stores/wallet.js';
-import { createDebug } from '$lib/utils/debug.js';
+} from '../stores/nostr.js';
+import { initWallet } from '../stores/wallet.js';
+import { createDebug } from '../utils/debug.js';
 import { initNavigation } from '../stores/navigation.js';
 import { startUnpublishedEventsMonitor } from './unpublishedEvents.js';
 

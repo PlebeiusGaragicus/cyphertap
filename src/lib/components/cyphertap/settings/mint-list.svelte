@@ -1,11 +1,11 @@
 <!-- src/lib/components/settings/MintList.svelte -->
 <script lang="ts">
-	import { mintInfo, addMint } from '$lib/stores/wallet.js';
+	import { mintInfo, addMint } from '../../../stores/wallet.js';
     import Plus from '@lucide/svelte/icons/plus';
     import LoaderCircle from '@lucide/svelte/icons/loader-circle';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import Button from '../../ui/button/button.svelte';
+	import Input from '../../ui/input/input.svelte';
+	import Separator from '../../ui/separator/separator.svelte';
 	import MintListItem from './mint-list-item.svelte';
 
 	let mintUrl = $state('');

@@ -4,17 +4,17 @@
 		walletTransactions,
 		formatTransaction,
 		isLoadingTransactions
-	} from '$lib/stores/wallet.js';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
+	} from '../../../stores/wallet.js';
+	import Separator from '../../ui/separator/separator.svelte';
     import ArrowDownLeft from '@lucide/svelte/icons/arrow-down-left'
     import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right'
     import LoaderCircle from '@lucide/svelte/icons/loader-circle'
     import ChevronRight from '@lucide/svelte/icons/chevron-right';
 
 	import { formatDistanceToNow } from 'date-fns';
-	import { navigateTo } from '$lib/stores/navigation.js';
-	import { formatTransactionDescription } from '$lib/utils/tx.js';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { navigateTo } from '../../../stores/navigation.js';
+	import { formatTransactionDescription } from '../../../utils/tx.js';
+	import Button from '../../ui/button/button.svelte';
 	// Props
 	let { limit = 3 }: { limit?: number } = $props();
 	// Format the timestamp for display

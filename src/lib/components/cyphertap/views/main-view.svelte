@@ -1,10 +1,10 @@
 <!-- src/lib/components/nostr/NostrMainView.svelte -->
 <script lang="ts">
-	import { currentUser } from '$lib/stores/nostr.js';
-	import { isLoadingTransactions, walletTransactions } from '$lib/stores/wallet.js';
-    import { navigateTo } from '$lib/stores/navigation.js';
+	import { currentUser } from '../../../stores/nostr.js';
+	import { isLoadingTransactions, walletTransactions } from '../../../stores/wallet.js';
+    import { navigateTo } from '../../../stores/navigation.js';
 
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
 	import ViewContainer from './view-container.svelte';
 	import WalletBalance from '../wallet/wallet-balance.svelte';
 	import RecentTransactions from '../wallet/recent-transactions.svelte';

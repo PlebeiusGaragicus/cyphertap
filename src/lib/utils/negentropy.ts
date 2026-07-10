@@ -1,5 +1,5 @@
 // src/lib/utils/negentropy.ts
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from './debug.js';
 
 const debug = createDebug('negentropy');
 
@@ -32,7 +32,7 @@ export const loadNegentropy = (): Promise<void> => {
         }
 
         d.log('Loading Negentropy library...');
-        const mod = await import('$lib/vendor/negentropy-browser.js');
+        const mod = await import('../vendor/negentropy-browser.js');
         window.Negentropy = mod.Negentropy;
         window.NegentropyStorageVector = mod.NegentropyStorageVector;
 

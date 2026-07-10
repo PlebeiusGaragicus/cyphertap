@@ -1,18 +1,18 @@
 <!-- src/lib/components/settings/MintManagement.svelte -->
 <script lang="ts">
-	import { consolidateTokens } from '$lib/stores/wallet.js';
-    import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js'
+	import { consolidateTokens } from '../../../stores/wallet.js';
+    import { Alert, AlertDescription } from '../../ui/alert/index.js'
 
     import Banknote from '@lucide/svelte/icons/banknote';
     import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import MintList from './mint-list.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import { AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
+	import Separator from '../../ui/separator/separator.svelte';
+	import Button from '../../ui/button/button.svelte';
+	import { AccordionItem, AccordionContent, AccordionTrigger}  from '../../ui/accordion/index.js';
 
 	// Simple state for the consolidation process
-	let isConsolidating: boolean = false;
-	let consolidateError: string | null = '';
+	let isConsolidating: boolean = $state(false);
+	let consolidateError: string | null = $state('');
 
 	async function handleConsolidate() {
 		try {

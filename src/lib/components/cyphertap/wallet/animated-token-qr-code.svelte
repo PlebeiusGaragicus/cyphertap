@@ -2,8 +2,8 @@
 	import { onDestroy } from 'svelte';
 	import QRCode from '@castlenine/svelte-qrcode';
 
-	import {Accordion, AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
-	import { Button } from '$lib/components/ui/button/index.js';
+	import {Accordion, AccordionItem, AccordionContent, AccordionTrigger}  from '../../ui/accordion/index.js';
+	import { Button } from '../../ui/button/index.js';
     import LoaderCircle from '@lucide/svelte/icons/loader-circle';
     import Grid2X2 from '@lucide/svelte/icons/grid-2x2';
     import Grid3X3 from '@lucide/svelte/icons/grid-3x3';

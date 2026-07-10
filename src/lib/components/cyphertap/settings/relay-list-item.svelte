@@ -1,10 +1,10 @@
 <!-- src/lib/components/settings/RelayListItem.svelte -->
 <script lang="ts">
-	import { removeRelay } from '$lib/stores/nostr.js';
-	import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator }  from '$lib/components/ui/dropdown-menu/index.js';
-	import { copyToClipboard } from '$lib/utils/clipboard.js';
+	import { removeRelay } from '../../../stores/nostr.js';
+	import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuSeparator }  from '../../ui/dropdown-menu/index.js';
+	import { copyToClipboard } from '../../../utils/clipboard.js';
     import Ellipsis from '@lucide/svelte/icons/ellipsis';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
 
 	let {
 		relay

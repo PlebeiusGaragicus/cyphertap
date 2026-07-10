@@ -23,7 +23,7 @@ import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 import { getNDK, ndkInstance } from './nostr.js';
 import { getConfig } from './config.js';
 import { validateMint } from '../utils/validateMint.js';
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from '../utils/debug.js';
 
 // Create a debug logger for the wallet module
 const d = createDebug('wallet');

@@ -1,12 +1,12 @@
 
 <script>
   // Checkout BorderBeam Component from Special Effects
-  import BorderBeam from "$lib/magicui/special-effects/border-beam/border-beam.svelte"; // Checkout BorderBeam Component from Special Effects
+  import BorderBeam from "../../../../magicui/special-effects/border-beam/border-beam.svelte"; // Checkout BorderBeam Component from Special Effects
   import AnimatedBeam from "./animated-beam.svelte";
   import Circle from "./circle.svelte";
-  let containerRef;
-  let div1Ref;
-  let div2Ref;
+  let containerRef = $state();
+  let div1Ref = $state();
+  let div2Ref = $state();
 </script>
 
 <div

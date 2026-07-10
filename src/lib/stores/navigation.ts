@@ -2,7 +2,7 @@
 import { writable, get } from 'svelte/store';
 import type { NDKCashuWalletTx } from '@nostr-dev-kit/ndk';
 import { isLoggedIn } from './nostr.js';
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from '../utils/debug.js';
 
 // Create debug logger for navigation 
 const debug = createDebug('navigation');

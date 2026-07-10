@@ -4,12 +4,12 @@
 	import { toast } from 'svelte-sonner';
 	import { getDecodedToken, type Proof } from '@cashu/cashu-ts';
 
-	import { pasteFromClipboard, copyToClipboard } from '$lib/utils/clipboard.js';
-	import { scanResult } from '$lib/stores/scan-store.js';
-	import { navigateTo } from '$lib/stores/navigation.js';
+	import { pasteFromClipboard, copyToClipboard } from '../../../utils/clipboard.js';
+	import { scanResult } from '../../../stores/scan-store.js';
+	import { navigateTo } from '../../../stores/navigation.js';
 
-    import { Tabs, TabsList, TabsTrigger, TabsContent } from "$lib/components/ui/tabs/index.js";
-	import { wallet, createDeposit, receiveToken, addMint } from '$lib/stores/wallet.js';
+    import { Tabs, TabsList, TabsTrigger, TabsContent } from "../../ui/tabs/index.js";
+	import { wallet, createDeposit, receiveToken, addMint } from '../../../stores/wallet.js';
 
     import Copy from '@lucide/svelte/icons/copy';
     import LoaderCircle from '@lucide/svelte/icons/loader-circle';
@@ -23,9 +23,9 @@
     import ShieldCheck from '@lucide/svelte/icons/shield-check';
     import ShieldAlert from '@lucide/svelte/icons/shield-alert';
 	import ViewContainer from './view-container.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Label from '$lib/components/ui/label/label.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
+	import Button from '../../ui/button/button.svelte';
+	import Label from '../../ui/label/label.svelte';
+	import Input from '../../ui/input/input.svelte';
 	import LnQrCode from '../wallet/ln-qr-code.svelte';
 
 	// Common state

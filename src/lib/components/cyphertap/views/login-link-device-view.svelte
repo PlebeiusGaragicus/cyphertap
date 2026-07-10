@@ -1,28 +1,28 @@
 <!-- src/lib/components/nostr/LinkDeviceLoginView.svelte -->
 <script lang="ts">
-	import { navigateTo } from '$lib/stores/navigation.js';
-	import { scanResult } from '$lib/stores/scan-store.js';
-	import { login } from '$lib/stores/nostr.js';
+	import { navigateTo } from '../../../stores/navigation.js';
+	import { scanResult } from '../../../stores/scan-store.js';
+	import { login } from '../../../stores/nostr.js';
 	import {
 		appState,
 		InitStatus
-	} from '$lib/services/init.svelte';
-	import { decryptToSigner } from '$lib/utils/nip49.js';
+	} from '../../../services/init.svelte';
+	import { decryptToSigner } from '../../../utils/nip49.js';
 	import { onMount } from 'svelte';
-    import { InputOTP, InputOTPGroup, InputOTPSlot } from "$lib/components/ui/input-otp/index.js";
+    import { InputOTP, InputOTPGroup, InputOTPSlot } from "../../ui/input-otp/index.js";
 	import { REGEXP_ONLY_DIGITS } from 'bits-ui';
 	import ViewContainer from './view-container.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
     import ChevronLeft from '@lucide/svelte/icons/chevron-left';
     import Link from '@lucide/svelte/icons/link'
     import Check from '@lucide/svelte/icons/check'
     import QrCode from '@lucide/svelte/icons/qr-code'
 
 	// State
-	let encryptedKey = '';
-	let pin = '';
-	let errorMessage = '';
-	let isProcessing = false;
+	let encryptedKey = $state('');
+	let pin = $state('');
+	let errorMessage = $state('');
+	let isProcessing = $state(false);
 
 	// Check for scanned result on mount
 	onMount(() => {

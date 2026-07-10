@@ -1,21 +1,20 @@
 <script lang="ts">
 	// Scroll down to see the original Component
-	import { cn } from '$lib/utils.js';
+	import { cn } from '../../../../utils.js';
 	import Landmark from '@lucide/svelte/icons/landmark';
   import EyesOff from '@lucide/svelte/icons/eye-off'
 	import AnimatedBeam from './animated-beam.svelte';
 	import Circle from './circle.svelte';
-	let containerRef;
+	let { class: className = '' }: { class?: string } = $props();
+	let containerRef = $state<HTMLElement>();
 	// Circles
-	let div1Ref;
-	let div2Ref;
-	let div3Ref;
-	let div4Ref;
-	let div5Ref;
-	let div6Ref;
-	let div7Ref;
-	let className: any = '';
-	export { className as class };
+	let div1Ref = $state<HTMLElement>();
+	let div2Ref = $state<HTMLElement>();
+	let div3Ref = $state<HTMLElement>();
+	let div4Ref = $state<HTMLElement>();
+	let div5Ref = $state<HTMLElement>();
+	let div6Ref = $state<HTMLElement>();
+	let div7Ref = $state<HTMLElement>();
 
   let mintIconSize = 30
   let mintCircleClass= "h-16 w-16 p-0"

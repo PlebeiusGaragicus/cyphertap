@@ -15,13 +15,13 @@ import {
   ndkInstance,
   currentUser,
   relayConnectionStatus
-} from '$lib/stores/nostr.js';
+} from '../stores/nostr.js';
 import {
   wallet,
   walletBalance,
   isWalletReady
-} from '$lib/stores/wallet.js';
-import { LatestEventTracker } from '$lib/utils/latest.js';
+} from '../stores/wallet.js';
+import { LatestEventTracker } from '../utils/latest.js';
 import { get, derived } from 'svelte/store';
 
 /** Plain-object shape delivered to subscription callbacks. */

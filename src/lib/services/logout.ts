@@ -3,10 +3,10 @@ import { get } from 'svelte/store';
 import { BROWSER as browser } from 'esm-env';
 
 // Import all the stores and methods we need to clean up
-import { logout as nostrLogout, currentUser } from '$lib/stores/nostr.js';
-import { clearWallet } from '$lib/stores/wallet.js';
+import { logout as nostrLogout, currentUser } from '../stores/nostr.js';
+import { clearWallet } from '../stores/wallet.js';
 import { appState, InitStatus } from './init.svelte.js';
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from '../utils/debug.js';
 
 // Create debug logger for logout service
 const d = createDebug('logout');

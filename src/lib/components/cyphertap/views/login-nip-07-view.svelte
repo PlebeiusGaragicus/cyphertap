@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { isConnecting, login } from '$lib/stores/nostr.js';
-	import { appState, InitStatus } from '$lib/services/init.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import { isConnecting, login } from '../../../stores/nostr.js';
+	import { appState, InitStatus } from '../../../services/init.svelte';
+	import Button from '../../ui/button/button.svelte';
 	import ChevronLeft from '@lucide/svelte/icons/chevron-left';
-	import { isUserMenuOpen, navigateTo } from '$lib/stores/navigation.js';
+	import { isUserMenuOpen, navigateTo } from '../../../stores/navigation.js';
 	import { onMount } from 'svelte';
 	import ViewContainer from './view-container.svelte';
 

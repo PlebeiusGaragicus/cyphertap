@@ -7,13 +7,13 @@
 	// For UR decoder (required for animated QR codes)
 	let URDecoder: any;
 	let urDecoder: any;
-	let urDecoderProgress: number = 0;
+	let urDecoderProgress: number = $state(0);
 
 	const dispatch = createEventDispatcher();
 
 	let videoElement: HTMLVideoElement;
 	let qrScanner: QrScanner | null = null;
-	let hasCamera = true;
+	let hasCamera = $state(true);
 
 	onMount(async () => {
 		try {

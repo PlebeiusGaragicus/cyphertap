@@ -1,6 +1,6 @@
 <!-- src/lib/components/wallet/WalletBalance.svelte -->
 <script lang="ts">
-	import { walletBalance, isWalletReady } from '$lib/stores/wallet.js';
+	import { walletBalance, isWalletReady } from '../../../stores/wallet.js';
     import LoaderCircle from '@lucide/svelte/icons/loader-circle'
 
 	let { compact = false }: { compact?: boolean } = $props();

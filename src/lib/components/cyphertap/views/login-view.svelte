@@ -1,16 +1,16 @@
 <!-- src/lib/components/nostr/NostrLoginView.svelte -->
 <script lang="ts">
-	import { isConnecting } from '$lib/stores/nostr.js';
-	import { appState, InitStatus } from '$lib/services/init.svelte.js';
-	import { navigateTo } from '$lib/stores/navigation.js';
+	import { isConnecting } from '../../../stores/nostr.js';
+	import { appState, InitStatus } from '../../../services/init.svelte.js';
+	import { navigateTo } from '../../../stores/navigation.js';
 	import { onMount } from 'svelte';
 	import ViewContainer from './view-container.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
 	import LogIn from '@lucide/svelte/icons/log-in'
 	import UserPlus from '@lucide/svelte/icons/user-plus'
 	import Key from '@lucide/svelte/icons/key'
 	import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone'
-	import Separator from '$lib/components/ui/separator/separator.svelte';
+	import Separator from '../../ui/separator/separator.svelte';
 
 	let hasNostrExtension = $state<boolean>(false);
 

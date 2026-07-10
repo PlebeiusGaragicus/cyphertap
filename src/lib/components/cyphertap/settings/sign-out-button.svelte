@@ -1,16 +1,16 @@
 <!-- src/lib/components/settings/SignOutButton.svelte -->
 <script lang="ts">
-	import { navigateTo } from '$lib/stores/navigation.js';
-	import { logout } from '$lib/services/logout.js';
+	import { navigateTo } from '../../../stores/navigation.js';
+	import { logout } from '../../../services/logout.js';
 
-	import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '$lib/components/ui/dialog/index.js';
-	import { Alert, AlertTitle, AlertDescription } from '$lib/components/ui/alert/index.js';
+	import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter, DialogClose } from '../../ui/dialog/index.js';
+	import { Alert, AlertTitle, AlertDescription } from '../../ui/alert/index.js';
 
     import LogOut from '@lucide/svelte/icons/log-out';
     import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
     import Database from '@lucide/svelte/icons/database';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Checkbox from '$lib/components/ui/checkbox/checkbox.svelte';
+	import Button from '../../ui/button/button.svelte';
+	import Checkbox from '../../ui/checkbox/checkbox.svelte';
 
 	let {
 		variant = 'outline',

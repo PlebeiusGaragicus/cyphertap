@@ -27,7 +27,7 @@ export function createLinkPayload(
 	pin: string
 ): { encryptedKey: string; qrData: string } {
 	// Import the nip49 functions (these will be available in the real implementation)
-	//const { encrypt } = await import('$lib/client/utils/nip49');
+	//const { encrypt } = await import('../client/utils/nip49');
 
 	// Convert private key to bytes using the hexToBytes utility from your nip49 module
 	const privateKeyBytes = hexToBytes(privateKey);

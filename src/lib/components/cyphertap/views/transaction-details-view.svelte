@@ -7,9 +7,9 @@
 		canReclaimTransaction,
 		formatTransaction,
 		reclaimToken
-	} from '$lib/stores/wallet.js';
-	import { navigateTo, context } from '$lib/stores/navigation.js';
-	import { formatTransactionDescription } from '$lib/utils/tx.js';
+	} from '../../../stores/wallet.js';
+	import { navigateTo, context } from '../../../stores/navigation.js';
+	import { formatTransactionDescription } from '../../../utils/tx.js';
     import ChevronLeft from '@lucide/svelte/icons/chevron-left';
     import ArrowDownLeft from '@lucide/svelte/icons/arrow-down-left';
     import ArrowUpRight from '@lucide/svelte/icons/arrow-up-right';
@@ -17,9 +17,9 @@
     import CalendarClock from '@lucide/svelte/icons/calendar-clock';
     import Undo from '@lucide/svelte/icons/undo';
 	import ViewContainer from './view-container.svelte';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Separator from '$lib/components/ui/separator/separator.svelte';
-    import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js'
+	import Button from '../../ui/button/button.svelte';
+	import Separator from '../../ui/separator/separator.svelte';
+    import { Alert, AlertDescription } from '../../ui/alert/index.js'
 
 	// Props for transaction details (read once from navigation context)
 	let tx: NDKCashuWalletTx = $context.tx!;

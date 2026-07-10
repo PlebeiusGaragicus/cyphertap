@@ -3,15 +3,13 @@
 This fork is not published to npm. Apps embed it — as a git submodule (the
 end-state for external repos) or as a workspace package (how the ecosystem
 monorepo consumes it). Both use the same mechanics: the app depends on the
-package directory and consumes the built `dist/`.
+package directory and consumes the library **from source** — `package.json`
+exports point at `src/lib/index.ts`, and `src/lib` uses only relative imports
+(no `$lib` alias), so the consumer's Vite compiles it directly. No build step,
+no stale dist: edits in the submodule HMR straight into the consuming app.
 
-## Why `dist/`, not raw source
-
-The source uses SvelteKit's `$lib` alias throughout. In a consuming app,
-`$lib` resolves to the *consumer's* lib directory, so raw-source consumption
-would break imports. `svelte-package` rewrites `$lib` to relative paths when
-emitting `dist/`, which makes the build output portable. Hence: consumers
-need `dist/` built once (and rebuilt after library edits).
+A `svelte-package` dist pipeline remains as an escape hatch (e.g. for
+consumers that can't compile TypeScript source):
 
 ```sh
 pnpm --filter cyphertap package        # build dist (svelte-package + css)
@@ -82,6 +80,9 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
    The library's internal side-effect CSS import survives dev mode but is
    tree-shaken out of consumer **production** builds — without the explicit
    import the widget renders completely unstyled, and only in prod.
+   (`cyphertap/styles.css` resolves to the committed `src/lib/styles.css`,
+   which `pnpm --filter cyphertap watch:css` regenerates when the library's
+   Tailwind classes change.)
 
 ## Usage
 
@@ -103,5 +104,5 @@ API highlights (see the `cyphertap` singleton): `publishEvent`,
 `getFollows()`, payments (`generateEcashToken`, `sendLightningPayment`, …).
 `getNDK()` is exported for power users (throws before login).
 
-Styles ship with the package (`dist/index.js` imports the compiled CSS);
-no Tailwind setup is required in the consumer.
+Styles ship with the package as prebuilt CSS; no Tailwind setup is required
+in the consumer.

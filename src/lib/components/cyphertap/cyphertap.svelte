@@ -4,17 +4,17 @@
 		initNavigation,
 		isUserMenuOpen,
 		openMenu,
-	} from '$lib/stores/navigation.js';
+	} from '../../stores/navigation.js';
 	import { MediaQuery } from 'svelte/reactivity';
-	import { Popover, PopoverTrigger, PopoverContent }  from '$lib/components/ui/popover/index.js';
+	import { Popover, PopoverTrigger, PopoverContent }  from '../ui/popover/index.js';
 	import ViewRouter from './views/view-router.svelte';
 	import CyphertapTrigger from './cyphertap-trigger.svelte';
 
-	import { Drawer, DrawerTrigger, DrawerContent }  from '$lib/components/ui/drawer/index.js';
+	import { Drawer, DrawerTrigger, DrawerContent }  from '../ui/drawer/index.js';
 	import { onMount } from 'svelte';
 	import { BROWSER } from 'esm-env';
-	import { autoLogin } from '$lib/stores/nostr.js';
-	import { configure } from '$lib/stores/config.js';
+	import { autoLogin } from '../../stores/nostr.js';
+	import { configure } from '../../stores/config.js';
 
 	// Library configuration (see stores/config.ts). Applied in the script
 	// body so it lands before onMount's autoLogin.

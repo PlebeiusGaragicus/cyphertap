@@ -2,7 +2,7 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
 	import { fly } from 'svelte/transition';
-	import { startTransition, endTransition, direction } from '$lib/stores/navigation.js';
+	import { startTransition, endTransition, direction } from '../../../stores/navigation.js';
 
 	let {
 		// Allow passing additional classes

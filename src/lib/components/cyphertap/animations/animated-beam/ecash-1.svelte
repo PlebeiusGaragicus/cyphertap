@@ -1,6 +1,6 @@
 <script lang="ts">
 	// Scroll down to see the original Component
-	import { cn } from '$lib/utils.js';
+	import { cn } from '../../../../utils.js';
 	import Landmark from '@lucide/svelte/icons/landmark';
   import EyesOff from '@lucide/svelte/icons/eye-off'
 	import AnimatedBeam from './animated-beam.svelte';

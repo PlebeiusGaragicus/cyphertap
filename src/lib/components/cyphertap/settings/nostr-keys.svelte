@@ -1,15 +1,15 @@
 <!-- src/lib/components/cyphertap/settings/nostr-keys.svelte -->
 <script lang="ts">
-	import { currentUser, ndkInstance } from '$lib/stores/nostr.js';
+	import { currentUser, ndkInstance } from '../../../stores/nostr.js';
 	import { NDKPrivateKeySigner } from '@nostr-dev-kit/ndk';
-	import { copyToClipboard } from '$lib/utils/clipboard.js';
-    import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js'
-	import { AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
+	import { copyToClipboard } from '../../../utils/clipboard.js';
+    import { Alert, AlertDescription } from '../../ui/alert/index.js'
+	import { AccordionItem, AccordionContent, AccordionTrigger}  from '../../ui/accordion/index.js';
     import Copy from '@lucide/svelte/icons/copy';
     import Eye from '@lucide/svelte/icons/eye';
     import EyeOff from '@lucide/svelte/icons/eye-off';
     import Key from '@lucide/svelte/icons/key';
-	import Button from '$lib/components/ui/button/button.svelte';
+	import Button from '../../ui/button/button.svelte';
 
 	let showPrivateKey = $state(false);
 

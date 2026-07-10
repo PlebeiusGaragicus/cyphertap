@@ -4,14 +4,14 @@
 		AccordionItem,
 		AccordionContent,
 		AccordionTrigger
-	} from '$lib/components/ui/accordion/index.js';
-	import Button from '$lib/components/ui/button/button.svelte';
+	} from '../../ui/accordion/index.js';
+	import Button from '../../ui/button/button.svelte';
 	import SyncList from './sync-list.svelte';
 	import RefreshCw from '@lucide/svelte/icons/refresh-cw';
 	import Database from '@lucide/svelte/icons/database';
-	import { createWalletRelaySync, RelaySync } from '$lib/stores/relaySync.svelte.js';
-	import { relays, getNDK, currentUser } from '$lib/stores/nostr.js';
-	import { wallet } from '$lib/stores/wallet.js';
+	import { createWalletRelaySync, RelaySync } from '../../../stores/relaySync.svelte.js';
+	import { relays, getNDK, currentUser } from '../../../stores/nostr.js';
+	import { wallet } from '../../../stores/wallet.js';
 	import type { NDKRelay } from '@nostr-dev-kit/ndk';
 
     let relaySyncs = $state<RelaySync[]>($wallet?.relaySet?.relays.forEach((relay: NDKRelay) => createWalletRelaySync(relay, $currentUser?.pubkey!)) || [])

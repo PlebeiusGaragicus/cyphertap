@@ -1,8 +1,8 @@
 // src/lib/utils/negentropyWebSocket.ts
-import { createDebug } from '$lib/utils/debug.js';
+import { createDebug } from './debug.js';
 import { loadNegentropy, getNegentropy } from './negentropy.js';
 import type { NDKFilter, NDKEvent } from '@nostr-dev-kit/ndk';
-import type { NegentropyResult } from '$lib/types/negentropy.js';
+import type { NegentropyResult } from '../types/negentropy.js';
 
 const debug = createDebug('negentropy:ws');
 

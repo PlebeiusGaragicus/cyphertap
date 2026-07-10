@@ -1,6 +1,6 @@
 <!-- src/lib/components/cyphertap/settings/mint-list-item.svelte -->
 <script lang="ts">
-	import { removeMint, setAsMainMint, addMint } from '$lib/stores/wallet.js';
+	import { removeMint, setAsMainMint, addMint } from '../../../stores/wallet.js';
 	import {
 		Dialog,
 		DialogContent,
@@ -8,7 +8,7 @@
 		DialogTitle,
 		DialogDescription,
 		DialogFooter
-	} from '$lib/components/ui/dialog/index.js';
+	} from '../../ui/dialog/index.js';
 	import {
 		DropdownMenu,
 		DropdownMenuTrigger,
@@ -16,13 +16,13 @@
 		DropdownMenuGroup,
 		DropdownMenuSeparator,
 		DropdownMenuLabel
-	} from '$lib/components/ui/dropdown-menu/index.js';
+	} from '../../ui/dropdown-menu/index.js';
 
 	import Ellipsis from '@lucide/svelte/icons/ellipsis';
 	import TriangleAlert from '@lucide/svelte/icons/triangle-alert';
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Badge from '$lib/components/ui/badge/badge.svelte';
-	import DropdownMenuItem from '$lib/components/ui/dropdown-menu/dropdown-menu-item.svelte';
+	import Button from '../../ui/button/button.svelte';
+	import Badge from '../../ui/badge/badge.svelte';
+	import DropdownMenuItem from '../../ui/dropdown-menu/dropdown-menu-item.svelte';
 
 	let {
 		mint

@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { cn } from "$lib/utils.js";
+  import { cn } from "../../../../utils.js";
 
-  let className: any = "";
-  export { className as class };
+  import type { Snippet } from "svelte";
+
+  let { class: className = "", children }: { class?: string; children?: Snippet } = $props();
 </script>
 
 <div
@@ -11,5 +12,5 @@
     className
   )}
 >
-  <slot></slot>
+  {@render children?.()}
 </div>

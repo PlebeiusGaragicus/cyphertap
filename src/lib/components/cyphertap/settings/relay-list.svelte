@@ -1,12 +1,12 @@
 <!-- src/lib/components/settings/RelayList.svelte -->
 <script lang="ts">
-	import Button from '$lib/components/ui/button/button.svelte';
-	import Input from '$lib/components/ui/input/input.svelte';
-	import { relays, relayConnectionStatus, addRelay } from '$lib/stores/nostr.js';
+	import Button from '../../ui/button/button.svelte';
+	import Input from '../../ui/input/input.svelte';
+	import { relays, relayConnectionStatus, addRelay } from '../../../stores/nostr.js';
     import Plus from '@lucide/svelte/icons/plus';
 	import RelayListItem from './relay-list-item.svelte';
 
-	let relayUrl = '';
+	let relayUrl = $state('');
 
 	async function handleAddRelay() {
 		if (!relayUrl.trim()) return;

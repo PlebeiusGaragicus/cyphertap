@@ -6,12 +6,12 @@
         DropdownMenuContent,
         DropdownMenuGroup,
         DropdownMenuItem
-    } from '$lib/components/ui/dropdown-menu/index.js';
-    import { copyToClipboard } from '$lib/utils/clipboard.js';
-    import Button from '$lib/components/ui/button/button.svelte';
+    } from '../../ui/dropdown-menu/index.js';
+    import { copyToClipboard } from '../../../utils/clipboard.js';
+    import Button from '../../ui/button/button.svelte';
     import Ellipsis from '@lucide/svelte/icons/ellipsis';
     import RefreshCw from '@lucide/svelte/icons/refresh-cw';
-    import type { RelaySync } from '$lib/stores/relaySync.svelte.js';
+    import type { RelaySync } from '../../../stores/relaySync.svelte.js';
 	import Database from '@lucide/svelte/icons/database';
 
     let { relaySync }: { relaySync: RelaySync } = $props();

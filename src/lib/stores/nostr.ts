@@ -12,8 +12,8 @@ import {
 import { writable, derived, get } from 'svelte/store';
 import { BROWSER as browser } from 'esm-env'
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
-import { startUnpublishedEventsMonitor, stopUnpublishedEventsMonitor } from '$lib/services/unpublishedEvents.js';
-import { createDebug } from '$lib/utils/debug.js';
+import { startUnpublishedEventsMonitor, stopUnpublishedEventsMonitor } from '../services/unpublishedEvents.js';
+import { createDebug } from '../utils/debug.js';
 import { getConfig, markConfigConsumed } from './config.js';
 import { initWallet } from './wallet.js';
 import { navigateTo } from './navigation.js';

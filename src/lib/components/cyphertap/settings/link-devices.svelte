@@ -5,11 +5,11 @@
 	import QRCode from '@castlenine/svelte-qrcode';
 
 	import { NDKPrivateKeySigner } from '@nostr-dev-kit/ndk';
-	import { ndkInstance } from '$lib/stores/nostr.js';
-	import { createLinkPayload, generateRandomPin } from '$lib/utils/pin.js';
+	import { ndkInstance } from '../../../stores/nostr.js';
+	import { createLinkPayload, generateRandomPin } from '../../../utils/pin.js';
 
-	import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js';
-	import { AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
+	import { Alert, AlertDescription } from '../../ui/alert/index.js';
+	import { AccordionItem, AccordionContent, AccordionTrigger}  from '../../ui/accordion/index.js';
     import MonitorSmartphone from '@lucide/svelte/icons/monitor-smartphone';
 
 	// State variables
