@@ -1,35 +1,6 @@
-// Browser compatibility shim - add this at the top of negentropy.js
-(function() {
-    'use strict';
-    
-    // Create module/exports for browser environment if they don't exist
-    if (typeof module === 'undefined') {
-        window.module = { exports: {} };
-    }
-    if (typeof exports === 'undefined') {
-        window.exports = window.module.exports;
-    }
-    
-    // Store original module.exports to expose globally later
-    var originalModuleExports = null;
-    
-    // Override module.exports setter to capture the exports
-    Object.defineProperty(window.module, 'exports', {
-        get: function() { return originalModuleExports; },
-        set: function(value) { 
-            originalModuleExports = value;
-            // Expose globally for browser use
-            if (typeof window !== 'undefined') {
-                if (value && typeof value === 'function') {
-                    window.Negentropy = value;
-                } else if (value && value.Negentropy) {
-                    window.Negentropy = value.Negentropy;
-                    window.NegentropyStorageVector = value.NegentropyStorageVector;
-                }
-            }
-        }
-    });
-})();
+// @ts-nocheck
+// Vendored from github.com/hoytech/negentropy (js/Negentropy.js), converted
+// from CommonJS to an ES module (export statement at the bottom).
 
 // (C) 2023 Doug Hoyte. MIT license
 
@@ -619,4 +590,4 @@ function itemCompare(a, b) {
 }
 
 
-module.exports = { Negentropy, NegentropyStorageVector, };
+export { Negentropy, NegentropyStorageVector };

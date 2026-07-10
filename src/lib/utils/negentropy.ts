@@ -19,40 +19,33 @@ export const loadNegentropy = (): Promise<void> => {
         return loadingPromise;
     }
     
-    // Start loading
-    loadingPromise = new Promise((resolve, reject) => {
-        // Check if already available (in case script was loaded elsewhere)
+    // Start loading. The vendored library ships with the package and is
+    // code-split by the bundler (the old approach — a script tag pointing at
+    // /negentropy.js — 404'd in every consuming app, since that file only
+    // existed in this repo's static/ dir). The vendored file's browser shim
+    // exposes window.Negentropy / window.NegentropyStorageVector on import.
+    loadingPromise = (async () => {
         if (window.Negentropy && window.NegentropyStorageVector) {
             d.log('Negentropy already available on window');
             negentropyLoaded = true;
-            resolve();
             return;
         }
-        
+
         d.log('Loading Negentropy library...');
-        
-        const script = document.createElement('script');
-        script.src = '/negentropy.js';
-        script.onload = () => {
-            if (window.Negentropy && window.NegentropyStorageVector) {
-                d.log('✅ Negentropy loaded successfully');
-                negentropyLoaded = true;
-                resolve();
-            } else {
-                const error = new Error('Negentropy library did not load properly');
-                d.log('❌ Negentropy load failed:', error);
-                reject(error);
-            }
-        };
-        script.onerror = (error) => {
-            const err = new Error('Failed to load negentropy.js');
-            d.log('❌ Script load failed:', error);
-            reject(err);
-        };
-        
-        document.head.appendChild(script);
-    });
-    
+        const mod = await import('$lib/vendor/negentropy-browser.js');
+        window.Negentropy = mod.Negentropy;
+        window.NegentropyStorageVector = mod.NegentropyStorageVector;
+
+        if (window.Negentropy && window.NegentropyStorageVector) {
+            d.log('✅ Negentropy loaded successfully');
+            negentropyLoaded = true;
+        } else {
+            const error = new Error('Negentropy library did not load properly');
+            d.log('❌ Negentropy load failed:', error);
+            throw error;
+        }
+    })();
+
     return loadingPromise;
 };
 
