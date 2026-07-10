@@ -13,6 +13,7 @@
 	import { Drawer, DrawerTrigger, DrawerContent }  from '../ui/drawer/index.js';
 	import { onMount } from 'svelte';
 	import { BROWSER } from 'esm-env';
+	import { ModeWatcher } from 'mode-watcher';
 	import { autoLogin } from '../../stores/nostr.js';
 	import { configure } from '../../stores/config.js';
 
@@ -41,6 +42,13 @@
 		autoLogin();
 	})
 </script>
+
+{#if BROWSER}
+	<!-- Applies the light/dark mode (`.dark` on <html>) that the settings
+	     toggle sets via mode-watcher — without this the toggle is a no-op in
+	     consumer apps. Tracks OS preference until the user picks a mode. -->
+	<ModeWatcher />
+{/if}
 
 {#if !BROWSER}
 	<!-- SSR placeholder: same footprint as the trigger, hydrates into the real widget -->

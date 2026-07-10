@@ -122,6 +122,42 @@ describe('getFollows', () => {
 	});
 });
 
+describe('fetchEvents', () => {
+	it('throws before login', async () => {
+		await expect(cyphertap.fetchEvents({ kinds: [1] })).rejects.toThrow('NDK not initialized');
+	});
+
+	it('one-shot fetches with closeOnEose and returns plain events newest-first', async () => {
+		const { ndk } = await injectSignedInNDK();
+		const captured: { filter?: unknown; opts?: Record<string, unknown> } = {};
+		const raw = [
+			fakeNostrEvent({ kind: 1, id: 'a1'.repeat(32), content: 'old', created_at: 100 }),
+			fakeNostrEvent({ kind: 1, id: 'b2'.repeat(32), content: 'new', created_at: 300 }),
+			fakeNostrEvent({ kind: 1, id: 'c3'.repeat(32), content: 'mid', created_at: 200 })
+		];
+		ndk.fetchEvents = (async (filter: unknown, opts?: Record<string, unknown>) => {
+			captured.filter = filter;
+			captured.opts = opts;
+			return new Set(raw);
+		}) as unknown as typeof ndk.fetchEvents;
+
+		const events = await cyphertap.fetchEvents({ kinds: [1], until: 400 });
+
+		expect(captured.filter).toEqual({ kinds: [1], until: 400 });
+		expect(captured.opts).toMatchObject({ closeOnEose: true, groupable: false });
+		expect(events.map((e) => e.content)).toEqual(['new', 'mid', 'old']);
+		// plain objects, not NDKEvent instances
+		expect(events[0]).toEqual({
+			id: 'b2'.repeat(32),
+			pubkey: 'ab'.repeat(32),
+			content: 'new',
+			kind: 1,
+			created_at: 300,
+			tags: []
+		});
+	});
+});
+
 describe('subscribeLatest', () => {
 	it('keeps a long-lived, ungrouped subscription and stops it on unsubscribe', async () => {
 		const { ndk } = await injectSignedInNDK();

@@ -33,18 +33,17 @@ not just dev, for the same reason.
 
 ## Dark mode
 
-Dark mode is the `.dark` class on `<html>` — the consumer owns toggling it.
-The library ships no watcher in the component; `mode-watcher` in the repo is
-showcase-only. Minimal consumer toggle:
+Dark mode is the `.dark` class on `<html>`, and **the widget manages it**:
+`<Cyphertap/>` mounts [`mode-watcher`](https://github.com/svecosystem/mode-watcher),
+which tracks the OS preference until the user picks a mode with the Dark
+Mode toggle in the widget's settings (persisted to localStorage under
+`mode-watcher-mode`). Consumer apps get working dark mode for free — style
+your own elements with `.dark` selectors (or the library's CSS variables,
+which flip automatically).
 
-```svelte
-<button onclick={() => document.documentElement.classList.toggle('dark')}>
-	toggle theme
-</button>
-```
-
-If you want OS-preference tracking, persistence, and FOUC avoidance, use
-[`mode-watcher`](https://github.com/svecosystem/mode-watcher) in the app.
+To control the mode programmatically from the app, add `mode-watcher` as a
+dependency and call its `setMode('light' | 'dark' | 'system')` — the widget
+and the app share mode-watcher's global state.
 
 ## Variables that visibly matter
 

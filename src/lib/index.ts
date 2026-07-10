@@ -21,6 +21,10 @@ export { configure, type CyphertapConfig } from './stores/config.js';
 // Navigation state (for external control of the popover)
 export { isUserMenuOpen } from './stores/navigation.js';
 
+// NIP-19 helpers (npub/nprofile ↔ hex) so apps can handle mentions and
+// user input without importing a nostr library
+export { hexToNpub, npubToHex } from './utils/nip19.js';
+
 // // Utility functions
 // export { identifyScanType } from './stores/scan-store.js';
 // export { formatTransactionDescription } from './utils/tx.js';

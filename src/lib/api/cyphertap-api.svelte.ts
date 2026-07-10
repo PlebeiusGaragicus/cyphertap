@@ -289,6 +289,21 @@ export class CyphertapAPI {
     return [...follows];
   }
 
+  /**
+   * One-shot fetch: query relays, resolve on EOSE with the matching events
+   * newest-first. For live updates use subscribe/subscribeLatest instead.
+   */
+  async fetchEvents(filter: SimpleNostrFilter): Promise<SimpleNostrEvent[]> {
+    const ndk = get(ndkInstance);
+    if (!ndk) throw new Error('NDK not initialized');
+
+    const events = await ndk.fetchEvents(filter as NDKFilter, {
+      closeOnEose: true,
+      groupable: false
+    });
+    return [...events].map(toSimpleEvent).sort((a, b) => b.created_at - a.created_at);
+  }
+
   subscribe(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
