@@ -38,7 +38,12 @@ export const isWalletReady = writable<boolean>(false);
 export const isInitializingWallet = writable<boolean>(false);
 export const isLoadingTransactions = writable<boolean>(false);
 
-export const DEFAULT_MINTS = ['https://mint.cypherflow.ai'];
+// Overridable at build time by the consuming Vite app (e.g. to point at a
+// local mint during development). svelte-package preserves import.meta.env,
+// so the consumer's Vite build performs the substitution.
+export const DEFAULT_MINTS = [
+  import.meta.env.VITE_CASHU_MINT_URL || 'https://mint.cypherflow.ai'
+];
 export const REQUIRED_DEPOSIT_AMOUNT = 1; // in sats
 
 // Keep track of transaction IDs to avoid duplicates
