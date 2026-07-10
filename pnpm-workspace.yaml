@@ -1,0 +1,9 @@
+# pnpm settings (pnpm >= 10 reads these here, not from package.json's "pnpm" field)
+onlyBuiltDependencies:
+  - esbuild
+
+# ndk-cache-dexie pins @nostr-dev-kit/ndk@2.14.9 exactly, which gives the app
+# two structurally-incompatible copies of NDK's types (and two runtime copies).
+# Force the single version the other NDK packages resolve to.
+overrides:
+  "@nostr-dev-kit/ndk": 2.14.33
