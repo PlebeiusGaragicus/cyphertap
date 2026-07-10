@@ -21,6 +21,7 @@ import {
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 import { getNDK, ndkInstance } from './nostr.js';
+import { getConfig } from './config.js';
 import { validateMint } from '../utils/validateMint.js';
 import { createDebug } from '$lib/utils/debug.js';
 
@@ -40,12 +41,6 @@ export const isWalletReady = writable<boolean>(false);
 export const isInitializingWallet = writable<boolean>(false);
 export const isLoadingTransactions = writable<boolean>(false);
 
-// Overridable at build time by the consuming Vite app (e.g. to point at a
-// local mint during development). svelte-package preserves import.meta.env,
-// so the consumer's Vite build performs the substitution.
-export const DEFAULT_MINTS = [
-  import.meta.env.VITE_CASHU_MINT_URL || 'https://mint.cypherflow.ai'
-];
 export const REQUIRED_DEPOSIT_AMOUNT = 1; // in sats
 
 // Keep track of transaction IDs to avoid duplicates
@@ -67,15 +62,17 @@ export async function initWallet(isNewUser: boolean = false) {
   // const explicitRelaySet = NDKRelaySet.fromRelayUrls(ndk.explicitRelayUrls, ndk)
   try {
     if (isNewUser){
-      // For new quick start users, set up wallet with default mints
-      userWallet = await setupCashuWallet(DEFAULT_MINTS, poolRelaySet);
+      // For new quick start users, set up wallet with the configured mints
+      userWallet = await setupCashuWallet(getConfig().mints, poolRelaySet);
     } else {
-      // For everyone else, check if they already have a nip-60 wallet
+      // For everyone else, check if they already have a nip-60 wallet.
+      // Note: an existing wallet keeps the mint list stored in its own
+      // wallet event — configured mints only apply to NEW wallets.
       userWallet = await findExistingWallet(poolRelaySet);
       if (userWallet){
         d.log("Found existing NIP-60 wallet")
       } else {
-        userWallet = await setupCashuWallet(DEFAULT_MINTS, poolRelaySet);
+        userWallet = await setupCashuWallet(getConfig().mints, poolRelaySet);
       }
     }
 

@@ -14,6 +14,7 @@ import { BROWSER as browser } from 'esm-env'
 import NDKCacheAdapterDexie from "@nostr-dev-kit/ndk-cache-dexie";
 import { startUnpublishedEventsMonitor, stopUnpublishedEventsMonitor } from '$lib/services/unpublishedEvents.js';
 import { createDebug } from '$lib/utils/debug.js';
+import { getConfig, markConfigConsumed } from './config.js';
 import { initWallet } from './wallet.js';
 import { navigateTo } from './navigation.js';
 
@@ -71,13 +72,11 @@ export async function initNDK(signer: NDKSigner) {
   });
 
   d.log('Creating new NDK instance or updating existing one');
+  markConfigConsumed();
   const ndk =
     existingNdk ||
     new NDKSvelte({
-      explicitRelayUrls: [
-        'wss://relay.cypherflow.ai'
-        // Add other default relays as needed
-      ],
+      explicitRelayUrls: getConfig().relays,
       enableOutboxModel: false,
       autoFetchUserMutelist: false,
       signer: signer,
