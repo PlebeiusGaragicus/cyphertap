@@ -84,10 +84,22 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
    created — an existing wallet keeps the mint list from its own wallet
    event. Config changes after login apply on the next login.
 
+5. **Styles must be imported explicitly** in the app's root layout:
+
+   ```ts
+   import 'cyphertap/styles.css';
+   ```
+
+   The library's internal side-effect CSS import survives dev mode but is
+   tree-shaken out of consumer **production** builds — without the explicit
+   import the widget renders completely unstyled, and only in prod.
+
 ## Usage
 
 ```svelte
 <script lang="ts">
+    // in +layout.svelte
+    import 'cyphertap/styles.css';
     import { Cyphertap, cyphertap } from 'cyphertap';
 
     const RELAYS = ['wss://relay.damus.io', 'wss://nos.lol'];
