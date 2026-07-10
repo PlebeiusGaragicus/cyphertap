@@ -4,7 +4,11 @@ import './styles.css';
 export { default as Cyphertap } from '$lib/components/cyphertap/cyphertap.svelte';
 
 // Programmatic API
-export { cyphertap, type SimpleNostrEvent } from '$lib/api/cyphertap-api.svelte.js';
+export {
+	cyphertap,
+	type SimpleNostrEvent,
+	type SimpleNostrFilter
+} from '$lib/api/cyphertap-api.svelte.js';
 
 // Power-user escape hatch: the raw NDKSvelte instance. Throws before login;
 // its API is coupled to the library's NDK version — prefer the cyphertap API.

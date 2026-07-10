@@ -34,6 +34,20 @@ export interface SimpleNostrEvent {
   tags: string[][];
 }
 
+/**
+ * Plain-number filter accepted by subscribe/subscribeLatest, so consumers
+ * can use any kind (e.g. 30315) without importing NDK's NDKKind enum.
+ */
+export type SimpleNostrFilter = {
+  ids?: string[];
+  kinds?: number[];
+  authors?: string[];
+  since?: number;
+  until?: number;
+  limit?: number;
+  search?: string;
+} & { [key: `#${string}`]: string[] | undefined };
+
 function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
   return {
     id: event.id || '',
@@ -275,11 +289,11 @@ export class CyphertapAPI {
     return [...follows];
   }
 
-  subscribe(filter: NDKFilter, callback: (event: SimpleNostrEvent) => void): () => void {
+  subscribe(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
-    const subscription = ndk.subscribe(filter);
+    const subscription = ndk.subscribe(filter as NDKFilter);
     subscription.on('event', (event: NDKEvent) => {
       callback(toSimpleEvent(event));
     });
@@ -293,12 +307,12 @@ export class CyphertapAPI {
    * d tag for addressable kinds), so stale copies served by relays are
    * ignored. Falls back to per-event-id dedup for regular events.
    */
-  subscribeLatest(filter: NDKFilter, callback: (event: SimpleNostrEvent) => void): () => void {
+  subscribeLatest(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
     const latest = new LatestEventTracker();
-    const subscription = ndk.subscribe(filter, { closeOnEose: false, groupable: false });
+    const subscription = ndk.subscribe(filter as NDKFilter, { closeOnEose: false, groupable: false });
     subscription.on('event', (event: NDKEvent) => {
       if (!latest.accept(event.deduplicationKey(), event.created_at || 0)) return;
       callback(toSimpleEvent(event));
