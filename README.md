@@ -7,7 +7,9 @@ Stop reinventing the wheel for every Nostr app. CypherTap gives you a complete a
 > This is a maintained fork of [cypherflow/cyphertap](https://github.com/cypherflow/cyphertap).
 > It is **not published to npm** — apps embed it as a git submodule or workspace
 > package and consume it from source. See [docs/CONSUMING.md](docs/CONSUMING.md).
-> Theming: [docs/THEMING.md](docs/THEMING.md). Known debt: [docs/TECH-DEBT.md](docs/TECH-DEBT.md).
+> Theming: [docs/THEMING.md](docs/THEMING.md). Known debt and dated decisions:
+> [docs/TECH-DEBT.md](docs/TECH-DEBT.md). Contributor invariants, verification
+> steps, and testing patterns: [CLAUDE.md](CLAUDE.md).
 
 > **⚠️ HOT KEYS — READ BEFORE USING**
 >
