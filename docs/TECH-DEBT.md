@@ -49,14 +49,21 @@ demands zap fields (`target`, `recipientPubkey`) that the runtime never reads
 when minting a plain token. Remove the casts when NDK separates token-minting
 from zapping in its types (check again on the NDK 3.x upgrade).
 
-## 4. NDK 3.0 coordinated upgrade
+## 4. NDK 3.0 coordinated upgrade — **BLOCKED UPSTREAM (2026-07-10)**
 
-Published versions as of 2026-07: ndk 3.0.3, ndk-svelte 2.4.48,
-ndk-wallet 0.7.1, ndk-cache-dexie 2.6.44. This is a major-version migration
-and must be done as one coordinated bump across all four packages. When doing
-it, **remove the `@nostr-dev-kit/ndk: 2.14.33` override in
-pnpm-workspace.yaml** — it exists only to fix the 2.14.9/2.14.33 split among
-the 2.x packages and will fight a 3.x upgrade.
+NDK 3.0.3 is published, but every companion package still depends on NDK
+2.15.x (ndk-svelte 2.4.48 → 2.15.2 exact, ndk-wallet 0.7.x → ^2.15.0,
+ndk-cache-dexie 2.6.44 → 2.15.2 exact) — forcing 3.x would fight all of
+them. Done instead (2026-07-10): coordinated bump to **ndk 2.15.2 +
+ndk-svelte 2.4.48 + ndk-wallet 0.7.0 + ndk-cache-dexie 2.6.44**, override
+updated to 2.15.2 in both workspace files. ndk-wallet is pinned **exactly
+0.7.0** because **0.7.1 is a broken npm publish** (ships `src/` but no
+`dist/`, entry points dangle) — re-widen to `^0.7` once a fixed release
+lands. Revisit 3.0 when the companions move; when doing it, **remove the
+NDK override in both pnpm-workspace.yaml files** — it exists only to fix
+version splits among the 2.x packages and will fight a 3.x upgrade.
+Bonus from 0.7.0: NDKCashuWallet gains `mintList`/`fetchMintList`
+(kind 10019) — groundwork for NIP-61 nutzap reception.
 
 ## 5. `import.meta.env` makes the library Vite-only — **RESOLVED 2026-07-10**
 

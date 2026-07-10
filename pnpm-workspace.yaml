@@ -5,8 +5,8 @@ allowBuilds:
   esbuild: true
   sharp: true
 
-# ndk-cache-dexie pins @nostr-dev-kit/ndk@2.14.9 exactly, which gives the app
+# ndk-cache-dexie and ndk-svelte pin @nostr-dev-kit/ndk exactly, which can give the app
 # two structurally-incompatible copies of NDK's types (and two runtime copies).
 # Force the single version the other NDK packages resolve to.
 overrides:
-  "@nostr-dev-kit/ndk": 2.14.33
+  "@nostr-dev-kit/ndk": 2.15.2
