@@ -2,7 +2,7 @@
 <script lang="ts">
 	import { onDestroy, onMount } from 'svelte';
 	import { toast } from 'svelte-sonner';
-	import { getDecodedToken } from '@cashu/cashu-ts';
+	import { getDecodedToken, type Proof } from '@cashu/cashu-ts';
 
 	import { pasteFromClipboard, copyToClipboard } from '$lib/utils/clipboard.js';
 	import { scanResult } from '$lib/stores/scan-store.js';
@@ -113,7 +113,7 @@
 			}
 
 			// Calculate total amount from proofs
-			const tokenAmount = decoded.proofs.reduce((sum, proof) => {
+			const tokenAmount = decoded.proofs.reduce((sum: number, proof: Proof) => {
 				return sum + proof.amount;
 			}, 0);
 
