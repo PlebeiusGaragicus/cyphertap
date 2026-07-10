@@ -1,9 +1,10 @@
 // src/lib/api/cyphertap-api.svelte.ts
-import { 
-  type NDKFilter, 
-  type NDKRawEvent, 
+import {
+  type NDKFilter,
+  type NDKRawEvent,
   type NDKSubscription,
-  NDKEvent
+  NDKEvent,
+  NDKPublishError
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 
@@ -171,17 +172,35 @@ export class CyphertapAPI {
     }
   }
 
+  // Publish, tolerating relay-confirmation failures only. NDK throws
+  // NDKPublishError when fewer than the required relays confirm, but by then
+  // the event is signed and queued in the cache adapter for retry — so we log
+  // and move on. Anything else (no signer, invalid event) is a real failure.
+  private async publishWithRetryTolerance(ndkEvent: NDKEvent): Promise<void> {
+    try {
+      await ndkEvent.publish();
+    } catch (error) {
+      if (error instanceof NDKPublishError) {
+        console.warn(
+          `[CypherTap] Event ${ndkEvent.id} not confirmed by enough relays (published to ${error.publishedToRelays.size}), cached for retry`
+        );
+        return;
+      }
+      throw error;
+    }
+  }
+
   // Nostr operations
   async publishTextNote(content: string): Promise<{ id: string; pubkey: string }> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
-    
+
     const event = new NDKEvent(ndk, {
       kind: 1,
       content,
     });
-    await event.publish();
-    
+    await this.publishWithRetryTolerance(event);
+
     return {
       id: event.id || '',
       pubkey: event.pubkey || ''
@@ -191,9 +210,9 @@ export class CyphertapAPI {
   async publishEvent(event: Partial<NDKRawEvent>): Promise<{ id: string; pubkey: string }> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
-    
+
     const ndkEvent = new NDKEvent(ndk, event);
-    await ndkEvent.publish();
+    await this.publishWithRetryTolerance(ndkEvent);
 
     return {
       id: ndkEvent.id || '',
