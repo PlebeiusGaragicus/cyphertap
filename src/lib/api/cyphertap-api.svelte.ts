@@ -1,8 +1,10 @@
 // src/lib/api/cyphertap-api.svelte.ts
 import {
+  type CashuPaymentInfo,
   type NDKFilter,
   type NDKRawEvent,
   type NDKSubscription,
+  type NDKZapDetails,
   NDKEvent,
   NDKPublishError
 } from '@nostr-dev-kit/ndk';
@@ -137,11 +139,14 @@ export class CyphertapAPI {
     if (!currentWallet) throw new Error('Wallet not initialized');
     
     try {
+      // cashuPay's type demands zap fields (target/recipientPubkey), but at
+      // runtime it only reads amount/unit/mints/p2pk — we're minting a plain
+      // token, not zapping, so those fields don't apply.
       const paymentInfo = {
         amount,
         unit: 'sat' as const,
         paymentDescription: memo || `${amount} sats token`
-      };
+      } as NDKZapDetails<CashuPaymentInfo>;
       const result = await currentWallet.cashuPay(paymentInfo);
       if (!result?.mint || !result.proofs?.length) {
         throw new Error('No proofs returned by wallet');

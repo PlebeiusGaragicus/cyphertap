@@ -62,7 +62,10 @@ export function encrypt(
  */
 export function decrypt(encryptedKey: string, password: string): Uint8Array {
 	// Decode the bech32 string
-	const { prefix, words } = bech32.decode(encryptedKey, Bech32MaxSize);
+	if (!encryptedKey.includes('1')) {
+		throw new Error('Invalid encrypted key: not a bech32 string');
+	}
+	const { prefix, words } = bech32.decode(encryptedKey as `${string}1${string}`, Bech32MaxSize);
 
 	if (prefix !== 'ncryptsec') {
 		throw new Error(`Invalid prefix ${prefix}, expected 'ncryptsec'`);

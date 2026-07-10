@@ -1,6 +1,7 @@
 <!-- src/lib/components/cyphertap/settings/nostr-keys.svelte -->
 <script lang="ts">
 	import { currentUser, ndkInstance } from '$lib/stores/nostr.js';
+	import { NDKPrivateKeySigner } from '@nostr-dev-kit/ndk';
 	import { copyToClipboard } from '$lib/utils/clipboard.js';
     import { Alert, AlertDescription } from '$lib/components/ui/alert/index.js'
 	import { AccordionItem, AccordionContent, AccordionTrigger}  from '$lib/components/ui/accordion/index.js';
@@ -20,7 +21,7 @@
 	}
 
 	// Get private key from NDK signer if available
-	$: if ($ndkInstance && $ndkInstance.signer && 'privateKey' in $ndkInstance.signer) {
+	$: if ($ndkInstance?.signer instanceof NDKPrivateKeySigner) {
 		privateKey = $ndkInstance.signer.privateKey || '';
 	}
 

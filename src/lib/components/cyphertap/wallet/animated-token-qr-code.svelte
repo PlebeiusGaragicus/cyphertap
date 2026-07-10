@@ -49,8 +49,9 @@
 			// Create a buffer from the token string directly
 			const messageBuffer = new TextEncoder().encode(token);
 
-			// Create a UR object using fromBuffer method like in the React example
-			const ur = bcUrModule.UR.fromBuffer(messageBuffer);
+			// bc-ur's types want a Node Buffer, but at runtime it only reads the
+			// bytes, so a Uint8Array works in the browser
+			const ur = bcUrModule.UR.fromBuffer(messageBuffer as unknown as Buffer);
 
 			// Create the encoder with the configured density value
 			urEncoder = new bcUrModule.UREncoder(ur, densityValues[qrDensity], 0);

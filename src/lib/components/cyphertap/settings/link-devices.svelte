@@ -4,6 +4,7 @@
 	import { toast } from 'svelte-sonner';
 	import QRCode from '@castlenine/svelte-qrcode';
 
+	import { NDKPrivateKeySigner } from '@nostr-dev-kit/ndk';
 	import { ndkInstance } from '$lib/stores/nostr.js';
 	import { createLinkPayload, generateRandomPin } from '$lib/utils/pin.js';
 
@@ -18,7 +19,7 @@
 	let privateKey = '';
 
 	// Get private key from NDK signer if available
-	$: if ($ndkInstance && $ndkInstance.signer && 'privateKey' in $ndkInstance.signer) {
+	$: if ($ndkInstance?.signer instanceof NDKPrivateKeySigner) {
 		privateKey = $ndkInstance.signer.privateKey || '';
 	}
 

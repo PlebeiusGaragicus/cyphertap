@@ -20,8 +20,8 @@
         try{
             await addWalletRelay(relayUrl);
         } catch(e) {
-            error = e.message;
-            console.error("there was an error adding the wallet relay...", e.message)
+            error = e instanceof Error ? e.message : String(e);
+            console.error("there was an error adding the wallet relay...", error)
         } finally {
             isProcessing = false;
         }

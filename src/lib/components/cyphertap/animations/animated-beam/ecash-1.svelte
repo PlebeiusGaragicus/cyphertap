@@ -5,16 +5,12 @@
   import EyesOff from '@lucide/svelte/icons/eye-off'
 	import AnimatedBeam from './animated-beam.svelte';
 	import Circle from './circle.svelte';
-	let containerRef;
+	let containerRef: HTMLDivElement;
 	// Circles
-	let div1Ref;
-	let div2Ref;
-	let div3Ref;
-	let div4Ref;
-	let div5Ref;
-	let div6Ref;
-	let div7Ref;
-	let className: any = '';
+	let div1Ref: HTMLDivElement;
+	let div6Ref: HTMLDivElement;
+	let div7Ref: HTMLDivElement;
+	let className: string = '';
 	export { className as class };
 
   let mintIconSize = 30
@@ -62,9 +58,5 @@
 	</div>
 
 	<AnimatedBeam bind:containerRef bind:fromRef={div1Ref} bind:toRef={div6Ref} />
-	<AnimatedBeam bind:containerRef bind:fromRef={div2Ref} bind:toRef={div6Ref} />
-	<AnimatedBeam bind:containerRef bind:fromRef={div3Ref} bind:toRef={div6Ref} />
-	<AnimatedBeam bind:containerRef bind:fromRef={div4Ref} bind:toRef={div6Ref} />
-	<AnimatedBeam bind:containerRef bind:fromRef={div5Ref} bind:toRef={div6Ref} />
 	<AnimatedBeam bind:containerRef bind:fromRef={div6Ref} bind:toRef={div7Ref} />
 </div>

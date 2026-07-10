@@ -14,8 +14,10 @@ import {
   NDKCashuWalletTx,
   NDKKind,
   NDKEvent,
+  type CashuPaymentInfo,
   type LnPaymentInfo,
-  type NDKSubscription
+  type NDKSubscription,
+  type NDKZapDetails
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 import { getNDK, ndkInstance } from './nostr.js';
@@ -585,13 +587,15 @@ export async function generateToken(amount: number, recipientMints?: MintUrl[]) 
       }
     }
 
-    // Generate the token using NDK Cashu wallet
+    // Generate the token using NDK Cashu wallet. cashuPay's type demands zap
+    // fields (target/recipientPubkey), but at runtime it only reads
+    // amount/unit/mints/p2pk — we're minting a plain token, not zapping.
     const paymentInfo = {
       amount: amount,
       unit: 'sat',
       mints: [mint],
       paymentDescription: tokenDescription,
-    };
+    } as NDKZapDetails<CashuPaymentInfo>;
 
     dToken.log('Generating payment...', paymentInfo);
     const paymentResult = await currentWallet.cashuPay(paymentInfo);

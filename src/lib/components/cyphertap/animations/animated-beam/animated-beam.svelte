@@ -1,7 +1,7 @@
 <script lang="ts">
   import { cn } from "$lib/utils.js";
   import { onMount, tick } from "svelte";
-  import { M, Motion } from "svelte-motion";
+  import { Motion } from "svelte-motion";
 
   let className: any = "";
   export { className as class };
@@ -109,7 +109,6 @@
     stroke-linecap="round"
   />
   <defs>
-    <M.linearGradient />
     <Motion
       initial={{
         x1: "0%",
@@ -133,8 +132,10 @@
       isSVG={true}
       let:motion
     >
+      <!-- svelte-motion types its action for HTMLElement only, but it works on SVG elements -->
+      {@const svgMotion = motion as unknown as import('svelte/action').Action<SVGLinearGradientElement>}
       <linearGradient
-        use:motion
+        use:svgMotion
         {id}
         gradientUnits="userSpaceOnUse"
         class="transform-gpu"

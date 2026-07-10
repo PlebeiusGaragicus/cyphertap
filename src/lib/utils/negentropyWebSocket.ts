@@ -303,7 +303,7 @@ export async function performMultiFilterNegentropySync(
                     negentropyWs.addMessageHandler(subscriptionId, handleNegentropyMessage);
                     
                     // Start protocol for this filter
-                    negentropy.initiate().then(msg => {
+                    negentropy.initiate().then((msg: string) => {
                         const openMessage = JSON.stringify(["NEG-OPEN", subscriptionId, filter, msg]);
                         negentropyWs.send(openMessage);
                         d.log(`Sent NEG-OPEN message for filter ${filterIndex + 1}`);

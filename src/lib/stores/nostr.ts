@@ -1,6 +1,6 @@
 // src/lib/client/stores/nostr.ts
 import NDKSvelte from '@nostr-dev-kit/ndk-svelte';
-import NDK, {
+import {
   NDKPrivateKeySigner,
   type NDKUser,
   NDKNip07Signer,
@@ -408,7 +408,7 @@ export function logout(
   }
   d.log('Logout complete');
 }
-export function getNDK(): NDK {
+export function getNDK(): NDKSvelte {
   const ndk = get(ndkInstance);
 
   if (!ndk) {
