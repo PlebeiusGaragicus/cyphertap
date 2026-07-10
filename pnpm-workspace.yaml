@@ -1,6 +1,9 @@
 # pnpm settings (pnpm >= 10 reads these here, not from package.json's "pnpm" field)
-onlyBuiltDependencies:
-  - esbuild
+allowBuilds:
+  '@parcel/watcher': true
+  '@tailwindcss/oxide': true
+  esbuild: true
+  sharp: true
 
 # ndk-cache-dexie pins @nostr-dev-kit/ndk@2.14.9 exactly, which gives the app
 # two structurally-incompatible copies of NDK's types (and two runtime copies).
