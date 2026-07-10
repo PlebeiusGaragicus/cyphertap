@@ -11,18 +11,39 @@ import {
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 
 // Import existing stores directly
-import { 
-  ndkInstance, 
-  currentUser, 
-  relayConnectionStatus,
-  autoLogin
+import {
+  ndkInstance,
+  currentUser,
+  relayConnectionStatus
 } from '$lib/stores/nostr.js';
-import { 
-  wallet, 
-  walletBalance, 
+import {
+  wallet,
+  walletBalance,
   isWalletReady
 } from '$lib/stores/wallet.js';
+import { LatestEventTracker } from '$lib/utils/latest.js';
 import { get, derived } from 'svelte/store';
+
+/** Plain-object shape delivered to subscription callbacks. */
+export interface SimpleNostrEvent {
+  id: string;
+  pubkey: string;
+  content: string;
+  kind: number;
+  created_at: number;
+  tags: string[][];
+}
+
+function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
+  return {
+    id: event.id || '',
+    pubkey: event.pubkey || '',
+    content: event.content || '',
+    kind: event.kind || 0,
+    created_at: event.created_at || 0,
+    tags: event.tags || []
+  };
+}
 
 export class CyphertapAPI {
   private static instance: CyphertapAPI | null = null;
@@ -225,22 +246,64 @@ export class CyphertapAPI {
     };
   }
 
-  subscribe(filter: NDKFilter, callback: (event: { id: string; pubkey: string; content: string; kind: number; created_at: number; tags: string[][] }) => void): () => void {
+  /**
+   * Publish an addressable (parameterized replaceable) event — kind 3xxxx
+   * with a d tag, e.g. a NIP-38 user status (kind 30315, d "general").
+   * Relays replace the previous event with the same kind+pubkey+d.
+   */
+  async publishAddressable(
+    kind: number,
+    dTag: string,
+    content: string,
+    tags: string[][] = []
+  ): Promise<{ id: string; pubkey: string }> {
+    return this.publishEvent({
+      kind,
+      content,
+      tags: [['d', dTag], ...tags]
+    });
+  }
+
+  /**
+   * Pubkeys (hex) from the logged-in user's contact list (kind 3).
+   */
+  async getFollows(): Promise<string[]> {
+    const user = get(currentUser);
+    if (!user) throw new Error('Not logged in');
+
+    const follows = await user.followSet({ closeOnEose: true });
+    return [...follows];
+  }
+
+  subscribe(filter: NDKFilter, callback: (event: SimpleNostrEvent) => void): () => void {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
     const subscription = ndk.subscribe(filter);
     subscription.on('event', (event: NDKEvent) => {
-      callback({
-        id: event.id || '',
-        pubkey: event.pubkey || '',
-        content: event.content || '',
-        kind: event.kind || 0,
-        created_at: event.created_at || 0,
-        tags: event.tags || []
-      });
+      callback(toSimpleEvent(event));
     });
-    
+
+    return () => subscription.stop();
+  }
+
+  /**
+   * Like subscribe, but for replaceable/addressable events: the callback only
+   * fires for the newest version per deduplication key (kind:pubkey, plus the
+   * d tag for addressable kinds), so stale copies served by relays are
+   * ignored. Falls back to per-event-id dedup for regular events.
+   */
+  subscribeLatest(filter: NDKFilter, callback: (event: SimpleNostrEvent) => void): () => void {
+    const ndk = get(ndkInstance);
+    if (!ndk) throw new Error('NDK not initialized');
+
+    const latest = new LatestEventTracker();
+    const subscription = ndk.subscribe(filter, { closeOnEose: false, groupable: false });
+    subscription.on('event', (event: NDKEvent) => {
+      if (!latest.accept(event.deduplicationKey(), event.created_at || 0)) return;
+      callback(toSimpleEvent(event));
+    });
+
     return () => subscription.stop();
   }
 

@@ -77,18 +77,30 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
 
    (Goes away when the library itself migrates to runes — see TECH-DEBT.)
 
-4. **Optional build-time default mint**: set `VITE_CASHU_MINT_URL` in the
-   consumer's env to override `DEFAULT_MINTS`.
+4. **Relays and mints**: pass props (or call `configure()` before mounting).
+   Defaults are cypherflow.ai infrastructure — production apps should set
+   their own. Layering: props/`configure()` > `VITE_CASHU_MINT_URL` env >
+   hardcoded default. Note: mints only apply when a NEW NIP-60 wallet is
+   created — an existing wallet keeps the mint list from its own wallet
+   event. Config changes after login apply on the next login.
 
 ## Usage
 
 ```svelte
 <script lang="ts">
     import { Cyphertap, cyphertap } from 'cyphertap';
+
+    const RELAYS = ['wss://relay.damus.io', 'wss://nos.lol'];
 </script>
 
-<Cyphertap />
+<Cyphertap relays={RELAYS} mints={['https://mint.example.com']} />
 ```
+
+API highlights (see the `cyphertap` singleton): `publishEvent`,
+`publishAddressable(kind, dTag, content, tags?)`, `subscribe`,
+`subscribeLatest` (newest-per-key dedup for replaceable/addressable kinds),
+`getFollows()`, payments (`generateEcashToken`, `sendLightningPayment`, …).
+`getNDK()` is exported for power users (throws before login).
 
 Styles ship with the package (`dist/index.js` imports the compiled CSS);
 no Tailwind setup is required in the consumer.

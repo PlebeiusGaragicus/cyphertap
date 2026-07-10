@@ -4,7 +4,15 @@ import './styles.css';
 export { default as Cyphertap } from '$lib/components/cyphertap/cyphertap.svelte';
 
 // Programmatic API
-export { cyphertap } from '$lib/api/cyphertap-api.svelte.js';
+export { cyphertap, type SimpleNostrEvent } from '$lib/api/cyphertap-api.svelte.js';
+
+// Power-user escape hatch: the raw NDKSvelte instance. Throws before login;
+// its API is coupled to the library's NDK version — prefer the cyphertap API.
+export { getNDK } from '$lib/stores/nostr.js';
+
+// Library configuration (relays/mints) — call before mounting <Cyphertap/>,
+// or pass the equivalent component props
+export { configure, type CyphertapConfig } from '$lib/stores/config.js';
 
 // Navigation state (for external control of the popover)
 export { isUserMenuOpen } from '$lib/stores/navigation.js';
