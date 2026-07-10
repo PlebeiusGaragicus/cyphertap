@@ -9,6 +9,8 @@
 		"build:css": "pnpx @tailwindcss/cli -i ./src/lib/tailwind.css -o ./dist/styles.css --minify",
 		"preview": "vite preview",
 		"prepare": "svelte-kit sync || echo ''",
+		"package": "svelte-kit sync && svelte-package && pnpm run build:css",
+		"package:watch": "svelte-kit sync && svelte-package --watch",
 		"prepack": "svelte-kit sync && svelte-package && pnpm run build:css && publint",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",

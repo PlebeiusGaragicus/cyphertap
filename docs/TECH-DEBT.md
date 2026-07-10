@@ -61,17 +61,27 @@ non-issue if the library is consumed from source by Vite/SvelteKit apps (see
 distribution decision); the clean general fix is a `configure({ mints })` /
 component-prop API instead of env sniffing.
 
-## 6. Distribution: not npm — embedded — **DECISION**
+## 6. Distribution: embedded, not npm — **DECIDED 2026-07-10**
 
-Upstream publishes `cyphertap` to npm; this fork will not. It should be
-embedded in consuming apps (submodule / vendor / workspace). Whichever
-mechanism is chosen, follow-ups here:
+The fork is embedded in consuming apps: workspace package in the ecosystem
+monorepo now, git submodule (`vendor/cyphertap` + `file:` dependency) for
+external app repos. See `docs/CONSUMING.md` for the full pattern. Consumption
+is **dist-based** (not raw source) because the source uses `$lib` aliases
+that only `svelte-package` rewrites to portable relative paths. Remaining
+follow-ups:
 
-- Decide dist-consumption vs source-consumption (source likely: consumers'
-  Vite compiles `src/lib` directly; kills the item-5 warning as a bonus).
 - `package.json` still points `repository`/`homepage`/`author` at upstream
   cypherflow — update once identity/rebrand is decided. Keep upstream's MIT
   license and attribution regardless.
+
+## 6b. Components are legacy-mode Svelte 5 (pre-runes)
+
+Most components use `$:`/`export let` legacy syntax. New SvelteKit scaffolds
+force runes mode, which breaks compilation of linked packages unless the
+consumer adds an exception (documented in CONSUMING.md). Migrating the
+components to runes removes that consumer footgun and is the direction
+Svelte 6 forces anyway. Mechanical but touches most components — a good
+incremental migration.
 
 ## 7. svelte-motion is Svelte-4 era
 
