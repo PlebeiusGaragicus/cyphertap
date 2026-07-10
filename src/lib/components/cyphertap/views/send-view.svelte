@@ -443,6 +443,14 @@
 										{preset.label}
 									</Button>
 								{/each}
+								<Button
+									variant="outline"
+									size="sm"
+									onclick={() => (tokenAmount = $walletBalance.toString())}
+									disabled={$walletBalance < 1}
+								>
+									Max
+								</Button>
 							</div>
 						</div>
 
