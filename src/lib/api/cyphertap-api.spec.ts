@@ -196,6 +196,75 @@ describe('fetchEvents', () => {
 	});
 });
 
+describe('getRelayList (NIP-65)', () => {
+	const relayListEvent = (created_at: number, tags: string[][]) => ({
+		id: 'aa'.repeat(32),
+		pubkey: 'bb'.repeat(32),
+		kind: 10002,
+		content: '',
+		created_at,
+		tags,
+		sig: '',
+		relay: undefined
+	});
+
+	it('splits r tags into read/write per the marker rules', async () => {
+		const { ndk } = await injectSignedInNDK();
+		ndk.fetchEvents = (async () =>
+			new Set([
+				relayListEvent(100, [
+					['r', 'wss://both.example.com/'],
+					['r', 'wss://writeonly.example.com', 'write'],
+					['r', 'wss://readonly.example.com', 'read'],
+					['r', 'not-a-url'],
+					['p', 'wss://wrong-tag.example.com']
+				])
+			])) as unknown as typeof ndk.fetchEvents;
+
+		const list = await cyphertap.getRelayList('bb'.repeat(32));
+		expect(list.read).toEqual(['wss://both.example.com', 'wss://readonly.example.com']);
+		expect(list.write).toEqual(['wss://both.example.com', 'wss://writeonly.example.com']);
+	});
+
+	it('uses the newest version when relays disagree', async () => {
+		const { ndk } = await injectSignedInNDK();
+		ndk.fetchEvents = (async () =>
+			new Set([
+				relayListEvent(100, [['r', 'wss://old.example.com']]),
+				relayListEvent(200, [['r', 'wss://new.example.com']])
+			])) as unknown as typeof ndk.fetchEvents;
+		const list = await cyphertap.getRelayList('bb'.repeat(32));
+		expect(list.read).toEqual(['wss://new.example.com']);
+	});
+
+	it('falls back to the relay-list indexers when the pool has nothing', async () => {
+		const { ndk } = await injectSignedInNDK();
+		const calls: unknown[] = [];
+		ndk.fetchEvents = (async (_f: unknown, _o: unknown, relaySet?: unknown) => {
+			calls.push(relaySet);
+			return calls.length === 1
+				? new Set()
+				: new Set([relayListEvent(100, [['r', 'wss://indexed.example.com']])]);
+		}) as unknown as typeof ndk.fetchEvents;
+
+		const list = await cyphertap.getRelayList('bb'.repeat(32));
+		expect(calls).toHaveLength(2);
+		expect(calls[0]).toBeUndefined(); // pool first
+		const indexerUrls = [...(calls[1] as { relays: Set<{ url: string }> }).relays].map((r) => r.url);
+		expect(indexerUrls).toContain('wss://purplepag.es/');
+		expect(list.read).toEqual(['wss://indexed.example.com']);
+	});
+
+	it('returns empty lists for users without a relay list', async () => {
+		const { ndk } = await injectSignedInNDK();
+		ndk.fetchEvents = (async () => new Set()) as unknown as typeof ndk.fetchEvents;
+		await expect(cyphertap.getRelayList('bb'.repeat(32))).resolves.toEqual({
+			read: [],
+			write: []
+		});
+	});
+});
+
 describe('subscribeLatest', () => {
 	it('keeps a long-lived, ungrouped subscription and stops it on unsubscribe', async () => {
 		const { ndk } = await injectSignedInNDK();

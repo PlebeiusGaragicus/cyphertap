@@ -54,6 +54,10 @@ export type SimpleNostrFilter = {
   search?: string;
 } & { [key: `#${string}`]: string[] | undefined };
 
+/** Dedicated NIP-65 relay-list index relays, queried when the pool doesn't
+ * have a user's kind 10002. */
+const RELAY_LIST_INDEXERS = ['wss://purplepag.es'];
+
 function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
   return {
     id: event.id || '',
@@ -298,6 +302,44 @@ export class CyphertapAPI {
       content,
       tags: [['d', dTag], ...tags]
     });
+  }
+
+  /**
+   * NIP-65 relay list (kind 10002) for a pubkey: where they write their
+   * events and where they read mentions. Per the NIP, replies/mentions
+   * should be published to the tagged user's READ relays. Falls back to
+   * dedicated relay-list indexers when the configured pool doesn't have
+   * the list. Returns empty lists when the user never published one.
+   */
+  async getRelayList(pubkey: string): Promise<{ read: string[]; write: string[] }> {
+    const ndk = get(ndkInstance);
+    if (!ndk) throw new Error('NDK not initialized');
+
+    const filter: NDKFilter = { kinds: [10002], authors: [pubkey] };
+    const opts = {
+      closeOnEose: true,
+      groupable: false,
+      cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
+    };
+
+    let events = await ndk.fetchEvents(filter, opts);
+    if (!events.size) {
+      const indexers = NDKRelaySet.fromRelayUrls(RELAY_LIST_INDEXERS, ndk);
+      events = await ndk.fetchEvents(filter, opts, indexers);
+    }
+    // kind 10002 is replaceable, but different relays can serve different
+    // versions — use the newest
+    const latest = [...events].sort((a, b) => (b.created_at || 0) - (a.created_at || 0))[0];
+    const read: string[] = [];
+    const write: string[] = [];
+    for (const tag of latest?.tags ?? []) {
+      if (tag[0] !== 'r' || !/^wss?:\/\//.test(tag[1] || '')) continue;
+      const url = tag[1].replace(/\/+$/, '');
+      const marker = tag[2];
+      if (marker !== 'write' && !read.includes(url)) read.push(url);
+      if (marker !== 'read' && !write.includes(url)) write.push(url);
+    }
+    return { read, write };
   }
 
   /**

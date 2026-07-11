@@ -429,6 +429,7 @@ the mint list from its own wallet event. For non-component setups, call
 - `subscribe(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void`
 - `subscribeLatest(filter: SimpleNostrFilter, callback: (event: SimpleNostrEvent) => void): () => void` — newest-per-key dedup for replaceable/addressable kinds
 - `getFollows(): Promise<string[]>` — hex pubkeys from the user's kind-3 contact list
+- `getRelayList(pubkey: string): Promise<{ read: string[]; write: string[] }>` — NIP-65 relay list (kind 10002), with relay-list-indexer fallback; publish replies/mentions to the target's `read` relays
 - `encrypt(content: string, recipientPubkey: string): Promise<string>` (NIP-44)
 - `decrypt(encryptedContent: string, senderPubkey: string): Promise<string>` (NIP-44)
 - `getNDK(): NDKSvelte` — escape hatch for power users; throws before login, couples you to the library's NDK version
