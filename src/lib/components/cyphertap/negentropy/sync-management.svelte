@@ -26,7 +26,15 @@
 
 	// Initialize relay syncs when relays change
 	$effect(() => {
-		const ndk = getNDK();
+		// Re-runs during sign-out teardown, when NDK is already gone — an
+		// unguarded getNDK() throw here wedges the sign-out dialog open.
+		let ndk;
+		try {
+			ndk = getNDK();
+		} catch {
+			relaySyncs = [];
+			return;
+		}
 		const user = ndk.activeUser;
 
 		if (user?.pubkey && $relays.length > 0) {
