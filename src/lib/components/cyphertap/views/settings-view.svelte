@@ -29,7 +29,7 @@
 	}
 </script>
 
-<ViewContainer className="p-0 max-h-[55vh] md:max-h-[60vh]">
+<ViewContainer className="p-0">
 	<div class="mb-2 flex items-center p-2">
 		<Button variant="ghost" size="icon" onclick={() => navigateTo('main')} class="mr-2">
 			<ChevronLeft class="h-4 w-4" />
@@ -39,7 +39,7 @@
 
 	<ScrollArea class="p-2">
 		<!-- Settings content -->
-		<div class="max-h-[60vh] px-2 md:max-h-[50vh]">
+		<div class="max-h-[calc(var(--bits-popover-content-available-height,85vh)-5.5rem)] overflow-y-auto px-2">
 			<!-- Theme toggle -->
 			<div class="flex items-center justify-between border-b pb-4">
 				<div class="flex items-center space-x-2">
@@ -53,7 +53,7 @@
 				<Switch checked={mode.current === 'dark'} onCheckedChange={toggleTheme} />
 			</div>
 
-			<Accordion type="multiple" class="">
+			<Accordion type="single" class="">
 				<LinkDevices />
 				<SyncManagement />
 				<MintManagement />
