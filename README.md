@@ -61,7 +61,7 @@ Import the styles once in your root layout, then drop the component in:
 </script>
 
 <Cyphertap
-  relays={['wss://relay.damus.io', 'wss://nos.lol']}
+  relays={['wss://relay.abvstudio.net', 'wss://relay.primal.net']}
   mints={['https://mint.example.com']}
 />
 ```

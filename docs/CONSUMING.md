@@ -93,7 +93,7 @@ And copy the NDK override into the app's `pnpm-workspace.yaml` (see below).
     import 'cyphertap/styles.css';
     import { Cyphertap, cyphertap } from 'cyphertap';
 
-    const RELAYS = ['wss://relay.damus.io', 'wss://nos.lol'];
+    const RELAYS = ['wss://relay.abvstudio.net', 'wss://relay.primal.net'];
 </script>
 
 <Cyphertap relays={RELAYS} mints={['https://mint.example.com']} />
