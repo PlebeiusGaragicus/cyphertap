@@ -7,6 +7,7 @@ import {
   type NDKZapDetails,
   NDKEvent,
   NDKPublishError,
+  NDKRelaySet,
   NDKSubscriptionCacheUsage
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
@@ -223,9 +224,9 @@ export class CyphertapAPI {
   // NDKPublishError when fewer than the required relays confirm, but by then
   // the event is signed and queued in the cache adapter for retry — so we log
   // and move on. Anything else (no signer, invalid event) is a real failure.
-  private async publishWithRetryTolerance(ndkEvent: NDKEvent): Promise<void> {
+  private async publishWithRetryTolerance(ndkEvent: NDKEvent, relaySet?: NDKRelaySet): Promise<void> {
     try {
-      await ndkEvent.publish();
+      await ndkEvent.publish(relaySet);
     } catch (error) {
       if (error instanceof NDKPublishError) {
         console.warn(
@@ -254,12 +255,26 @@ export class CyphertapAPI {
     };
   }
 
-  async publishEvent(event: Partial<NDKRawEvent>): Promise<{ id: string; pubkey: string }> {
+  /**
+   * Publish an event. `opts.relays` adds explicit relay URLs on top of the
+   * configured pool — e.g. routing a reply to the relay the parent note was
+   * seen on, so the recipient actually finds it.
+   */
+  async publishEvent(
+    event: Partial<NDKRawEvent>,
+    opts?: { relays?: string[] }
+  ): Promise<{ id: string; pubkey: string }> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
+    let relaySet: NDKRelaySet | undefined;
+    if (opts?.relays?.length) {
+      const urls = new Set([...ndk.pool.relays.keys(), ...opts.relays]);
+      relaySet = NDKRelaySet.fromRelayUrls([...urls], ndk);
+    }
+
     const ndkEvent = new NDKEvent(ndk, event);
-    await this.publishWithRetryTolerance(ndkEvent);
+    await this.publishWithRetryTolerance(ndkEvent, relaySet);
 
     return {
       id: ndkEvent.id || '',

@@ -86,6 +86,42 @@ describe('publish error tolerance', () => {
 	});
 });
 
+describe('publishEvent relay targeting', () => {
+	it('publishes to the pool plus explicitly requested relays', async () => {
+		await injectSignedInNDK();
+		let capturedSet: unknown;
+		vi.spyOn(NDKEvent.prototype, 'publish').mockImplementation(async function (
+			this: NDKEvent,
+			relaySet?: unknown
+		) {
+			capturedSet = relaySet;
+			await this.sign();
+			return new Set<NDKRelay>();
+		});
+
+		await cyphertap.publishEvent(
+			{ kind: 1, content: 'targeted' },
+			{ relays: ['wss://relay.damus.io'] }
+		);
+		const urls = [...(capturedSet as { relays: Set<{ url: string }> }).relays].map((r) => r.url);
+		expect(urls).toContain('wss://relay.damus.io/');
+	});
+
+	it('publishes to the default pool when no relays are given', async () => {
+		await injectSignedInNDK();
+		let capturedSet: unknown = 'unset';
+		vi.spyOn(NDKEvent.prototype, 'publish').mockImplementation(async function (
+			this: NDKEvent,
+			relaySet?: unknown
+		) {
+			capturedSet = relaySet;
+			return new Set<NDKRelay>();
+		});
+		await cyphertap.publishEvent({ kind: 1, content: 'default' });
+		expect(capturedSet).toBeUndefined();
+	});
+});
+
 describe('publishAddressable', () => {
 	it('prepends the d tag and publishes once', async () => {
 		const { pubkey } = await injectSignedInNDK();
