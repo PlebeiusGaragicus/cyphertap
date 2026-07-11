@@ -32,6 +32,10 @@ export interface SimpleNostrEvent {
   kind: number;
   created_at: number;
   tags: string[][];
+  sig: string;
+  /** URL of the relay this event was first received from (undefined when
+   * served purely from the local cache or constructed locally). */
+  relay?: string;
 }
 
 /**
@@ -55,7 +59,9 @@ function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
     content: event.content || '',
     kind: event.kind || 0,
     created_at: event.created_at || 0,
-    tags: event.tags || []
+    tags: event.tags || [],
+    sig: event.sig || '',
+    relay: event.relay?.url
   };
 }
 

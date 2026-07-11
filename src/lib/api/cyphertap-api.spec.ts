@@ -153,7 +153,9 @@ describe('fetchEvents', () => {
 			content: 'new',
 			kind: 1,
 			created_at: 300,
-			tags: []
+			tags: [],
+			sig: '',
+			relay: undefined
 		});
 	});
 });
