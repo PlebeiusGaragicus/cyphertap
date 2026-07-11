@@ -6,7 +6,8 @@ import {
   type NDKSubscription,
   type NDKZapDetails,
   NDKEvent,
-  NDKPublishError
+  NDKPublishError,
+  NDKSubscriptionCacheUsage
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 
@@ -296,8 +297,11 @@ export class CyphertapAPI {
   }
 
   /**
-   * One-shot fetch: query relays, resolve on EOSE with the matching events
-   * newest-first. For live updates use subscribe/subscribeLatest instead.
+   * One-shot fetch: query the local cache AND relays in parallel, resolve on
+   * EOSE with the matching events newest-first. Cache and relays must both be
+   * consulted — NDK's CACHE_FIRST default can satisfy paginated queries from
+   * a partial cache and never ask the network. For live updates use
+   * subscribe/subscribeLatest instead.
    */
   async fetchEvents(filter: SimpleNostrFilter): Promise<SimpleNostrEvent[]> {
     const ndk = get(ndkInstance);
@@ -305,7 +309,8 @@ export class CyphertapAPI {
 
     const events = await ndk.fetchEvents(filter as NDKFilter, {
       closeOnEose: true,
-      groupable: false
+      groupable: false,
+      cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
     });
     return [...events].map(toSimpleEvent).sort((a, b) => b.created_at - a.created_at);
   }

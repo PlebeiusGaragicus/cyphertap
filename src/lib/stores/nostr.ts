@@ -539,15 +539,36 @@ export const relays = derived(ndkInstance, ($ndk) => {
   return relayList;
 });
 
-// Derived store for relay connection status
-export const relayConnectionStatus = derived(relays, ($relays) => {
-  const d = debug.extend('relayConnectionStatus')
-  const status = $relays.map((relay) => ({
-    url: relay.url,
-    connected: relay.status >= 5, // e.g., NDKRelayStatus.CONNECTED
-    status: relay.status
-  }));
-
-  d.log(`Relay connection status: ${status.filter(r => r.connected).length}/${status.length} connected`);
-  return status;
-});
+// Live relay connection status: recomputed on every pool connect/disconnect.
+// (A plain derived-from-ndkInstance snapshot runs once BEFORE any relay has
+// connected and then never updates — getConnectionStatus() reported 0/N
+// forever.)
+export const relayConnectionStatus = derived<typeof ndkInstance, { url: string; connected: boolean; status: number }[]>(
+  ndkInstance,
+  ($ndk, set) => {
+    const d = debug.extend('relayConnectionStatus');
+    if (!$ndk) {
+      set([]);
+      return;
+    }
+    const update = () => {
+      const status = Array.from($ndk.pool.relays.values()).map((relay) => ({
+        url: relay.url,
+        connected: relay.status >= 5, // NDKRelayStatus.CONNECTED
+        status: relay.status
+      }));
+      d.log(`Relay connection status: ${status.filter((r) => r.connected).length}/${status.length} connected`);
+      set(status);
+    };
+    update();
+    $ndk.pool.on('relay:connect', update);
+    $ndk.pool.on('relay:ready', update);
+    $ndk.pool.on('relay:disconnect', update);
+    return () => {
+      $ndk.pool.off('relay:connect', update);
+      $ndk.pool.off('relay:ready', update);
+      $ndk.pool.off('relay:disconnect', update);
+    };
+  },
+  []
+);
