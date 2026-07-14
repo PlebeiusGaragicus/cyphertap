@@ -297,6 +297,19 @@ export async function login(options: {
 }
 
 /**
+ * Wait for a NIP-07 extension to inject window.nostr. Extensions (Alby,
+ * nos2x…) inject asynchronously — MV3 service-worker wakeup can land well
+ * after the app has mounted — so "not there yet" is normal at startup.
+ */
+async function waitForExtension(timeoutMs = 5000): Promise<boolean> {
+  const start = Date.now();
+  while (!window.nostr && Date.now() - start < timeoutMs) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  return !!window.nostr;
+}
+
+/**
  * Try to auto-login with stored credentials
  * This function only handles the NDK initialization, not other components
  */
@@ -321,10 +334,11 @@ export async function autoLogin() {
         privateKey: storedKey
       })
     } else if (extensionMarker === 'true') {
-      d.log('Found extension login marker, attempting extension login');
+      d.log('Found extension login marker, waiting for extension');
 
-      // Check if extension is available
-      if (!window.nostr) {
+      // Extensions inject window.nostr asynchronously — give them a grace
+      // window instead of failing on the first tick.
+      if (!(await waitForExtension())) {
         d.error('Extension not available but marker exists');
         throw new Error('Nostr extension not found. Please install or enable your extension.');
       }
@@ -334,11 +348,11 @@ export async function autoLogin() {
       d.log('No stored credentials found, auto-login skipped');
     }
   } catch (error) {
-    d.error('Auto-login failed:', error);
-    // Clear potentially corrupted credentials
-    d.log('Clearing potentially corrupted credentials');
-    localStorage.removeItem(ENCRYPTED_KEY);
-    localStorage.removeItem(EXTENSION_LOGIN);
+    // Deliberately KEEP stored credentials: a transient failure here (slow
+    // extension injection, relay/wallet hiccup) must not destroy the session
+    // marker — or worse, a stored private key that may exist nowhere else.
+    // Recovery from a genuinely broken state is explicit logout.
+    d.error('Auto-login failed (credentials kept):', error);
   }
 
   return null;
