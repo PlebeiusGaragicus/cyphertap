@@ -218,18 +218,59 @@ describe('fetchEvents', () => {
 
 	it('queries ONLY the given relays when opts.relays is set, the pool otherwise', async () => {
 		const { ndk } = await injectSignedInNDK();
+
+		// Pool path: plain ndk.fetchEvents with no relay set.
 		const relaySets: unknown[] = [];
 		ndk.fetchEvents = (async (_f: unknown, _o: unknown, relaySet?: unknown) => {
 			relaySets.push(relaySet);
 			return new Set();
 		}) as unknown as typeof ndk.fetchEvents;
-
 		await cyphertap.fetchEvents({ kinds: [1059] });
+		expect(relaySets).toEqual([undefined]);
+
+		// Pinned path: goes through ndk.subscribe (autoStart=false) with an
+		// exclusive relaySet in opts — and the pool monitor neutralized BEFORE
+		// start (NDK 2.15 otherwise re-sends explicit-relay-set REQs to any
+		// pool relay that connects mid-subscription).
+		interface FakePinnedSub {
+			handlers: Map<string, (arg?: unknown) => void>;
+			monitorArmed: boolean;
+			on(name: string, handler: (arg?: unknown) => void): void;
+			startPoolMonitor(): void;
+			start(): void;
+		}
+		let capturedOpts: { relaySet?: { relays: Set<{ url: string }> } } | undefined;
+		let capturedSub: FakePinnedSub | undefined;
+		let capturedAutoStart: unknown;
+		ndk.subscribe = ((_filter: unknown, opts: typeof capturedOpts, autoStart: unknown) => {
+			const sub: FakePinnedSub = {
+				handlers: new Map(),
+				monitorArmed: false,
+				on(name, handler) {
+					this.handlers.set(name, handler);
+				},
+				// The real start() arms the monitor internally; the override in
+				// fetchEventsPinned must have replaced this by then.
+				startPoolMonitor() {
+					this.monitorArmed = true;
+				},
+				start() {
+					this.startPoolMonitor();
+					this.handlers.get('eose')?.();
+				}
+			};
+			capturedOpts = opts;
+			capturedSub = sub;
+			capturedAutoStart = autoStart;
+			return sub;
+		}) as unknown as typeof ndk.subscribe;
+
 		await cyphertap.fetchEvents({ kinds: [1059] }, { relays: ['wss://relay.abvstudio.net'] });
 
-		expect(relaySets[0]).toBeUndefined();
-		const urls = [...(relaySets[1] as { relays: Set<{ url: string }> }).relays].map((r) => r.url);
+		expect(capturedAutoStart).toBe(false);
+		const urls = [...(capturedOpts?.relaySet?.relays ?? [])].map((r) => r.url);
 		expect(urls).toEqual(['wss://relay.abvstudio.net/']);
+		expect(capturedSub?.monitorArmed).toBe(false);
 	});
 });
 

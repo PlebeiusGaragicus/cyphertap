@@ -74,6 +74,36 @@ function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
   };
 }
 
+/**
+ * ndk.fetchEvents with NDK 2.15's pool-monitor leak neutralized: every
+ * relay-querying subscription arms `startPoolMonitor`, which re-sends the
+ * filters to ANY pool relay that connects mid-subscription — ignoring the
+ * subscription's explicit relay set. A relay-pinned fetch racing pool
+ * startup therefore sprays its REQ across the whole pool. With a fixed
+ * relay set there is nothing for the monitor to discover, so disable it
+ * before start. Collect/dedup mirrors ndk.fetchEvents.
+ */
+function fetchEventsPinned(
+  ndk: NDKSvelte,
+  filter: NDKFilter,
+  opts: Record<string, unknown>,
+  relaySet: NDKRelaySet
+): Promise<Set<NDKEvent>> {
+  return new Promise((resolve) => {
+    const events = new Map<string, NDKEvent>();
+    const sub = ndk.subscribe(filter, { ...opts, closeOnEose: true, relaySet }, false);
+    (sub as unknown as { startPoolMonitor: () => void }).startPoolMonitor = () => {};
+    sub.on('event', (event: NDKEvent) => {
+      const key = event.deduplicationKey();
+      const existing = events.get(key);
+      if (existing && (existing.created_at ?? 0) >= (event.created_at ?? 0)) return;
+      events.set(key, event);
+    });
+    sub.on('eose', () => resolve(new Set(events.values())));
+    sub.start();
+  });
+}
+
 /** Resolve a relay-targeting option into an NDKRelaySet: undefined = the
  * configured pool; `relays` = pool ∪ relays; `relays` + `exclusive` = the
  * given relays ONLY. */
@@ -383,15 +413,15 @@ export class CyphertapAPI {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
-    const events = await ndk.fetchEvents(
-      filter as NDKFilter,
-      {
-        closeOnEose: true,
-        groupable: false,
-        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
-      },
-      buildRelaySet(ndk, { relays: opts?.relays, exclusive: true })
-    );
+    const subOpts = {
+      closeOnEose: true,
+      groupable: false,
+      cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
+    };
+    const relaySet = buildRelaySet(ndk, { relays: opts?.relays, exclusive: true });
+    const events = relaySet
+      ? await fetchEventsPinned(ndk, filter as NDKFilter, subOpts, relaySet)
+      : await ndk.fetchEvents(filter as NDKFilter, subOpts);
     return [...events].map(toSimpleEvent).sort((a, b) => b.created_at - a.created_at);
   }
 
