@@ -8,7 +8,9 @@ import {
   NDKEvent,
   NDKPublishError,
   NDKRelaySet,
-  NDKSubscriptionCacheUsage
+  NDKSubscriptionCacheUsage,
+  giftUnwrap,
+  giftWrap
 } from '@nostr-dev-kit/ndk';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 
@@ -402,6 +404,71 @@ export class CyphertapAPI {
     });
 
     return () => subscription.stop();
+  }
+
+  /**
+   * NIP-59: seal `rumor` (signed by the logged-in key, provable to the
+   * recipient only), wrap it with an ephemeral key (kind 1059, randomized
+   * created_at — backdated up to ~28h), and publish. The rumor stays
+   * unsigned inside the wrap; its kind/tags/content are caller-defined.
+   * `opts.relays` adds explicit relay URLs on top of the configured pool.
+   */
+  async giftWrapAndPublish(
+    rumor: Partial<SimpleNostrEvent>,
+    recipientHex: string,
+    opts?: { relays?: string[] }
+  ): Promise<{ id: string }> {
+    const ndk = get(ndkInstance);
+    if (!ndk) throw new Error('NDK not initialized');
+    if (!ndk.signer) throw new Error('Signer not available');
+
+    const sender = get(currentUser);
+    if (!sender) throw new Error('Not logged in');
+
+    const event = new NDKEvent(ndk, {
+      kind: rumor.kind,
+      content: rumor.content ?? '',
+      tags: rumor.tags ?? [],
+      created_at: rumor.created_at ?? Math.floor(Date.now() / 1000),
+      // giftUnwrap validates rumor.pubkey === seal.pubkey — the rumor must
+      // carry the sender even though it is never signed.
+      pubkey: sender.pubkey
+    } as NDKRawEvent);
+
+    const recipient = ndk.getUser({ pubkey: recipientHex });
+    const wrap = await giftWrap(event, recipient, ndk.signer);
+
+    let relaySet: NDKRelaySet | undefined;
+    if (opts?.relays?.length) {
+      const urls = new Set([...ndk.pool.relays.keys(), ...opts.relays]);
+      relaySet = NDKRelaySet.fromRelayUrls([...urls], ndk);
+    }
+    await this.publishWithRetryTolerance(wrap, relaySet);
+
+    return { id: wrap.id || '' };
+  }
+
+  /**
+   * NIP-59: unwrap a kind-1059 gift wrap addressed to the logged-in key and
+   * return the inner rumor (sig is empty — rumors are unsigned; authorship
+   * is the verified seal signature). Returns null when the wrap isn't for
+   * us or is malformed — callers iterate relay results without try/catch.
+   */
+  async unwrapGiftWrap(event: SimpleNostrEvent): Promise<SimpleNostrEvent | null> {
+    const ndk = get(ndkInstance);
+    if (!ndk?.signer) throw new Error('Signer not available');
+
+    try {
+      const wrap = new NDKEvent(ndk, event as NDKRawEvent);
+      // The signer must be passed explicitly: giftUnwrap's internal
+      // fallback dereferences the parameter, not the fallback variable.
+      const rumor = await giftUnwrap(wrap, undefined, ndk.signer);
+      return toSimpleEvent(rumor);
+    } catch {
+      // giftUnwrap rejects with a plain string on any decrypt/validation
+      // failure — treat every shape of failure as "not ours".
+      return null;
+    }
   }
 
   async signEvent(event: Partial<NDKRawEvent>): Promise<{ id: string; pubkey: string; signature: string }> {

@@ -4,11 +4,12 @@
 // rune-backed getters are intentionally untested here — no reactivity
 // flushing in the node project.
 import { getDecodedToken } from '@cashu/cashu-ts';
-import { NDKEvent, NDKPublishError, type NDKRelay } from '@nostr-dev-kit/ndk';
+import NDK, { NDKEvent, NDKPrivateKeySigner, NDKPublishError, type NDKRelay } from '@nostr-dev-kit/ndk';
 import type { NDKUser } from '@nostr-dev-kit/ndk';
+import type NDKSvelte from '@nostr-dev-kit/ndk-svelte';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { currentUser } from '../stores/nostr.js';
+import { currentUser, ndkInstance } from '../stores/nostr.js';
 import { cyphertap } from './cyphertap-api.svelte.js';
 import {
 	fakeNostrEvent,
@@ -314,6 +315,96 @@ describe('subscribeLatest', () => {
 		sub.emit(note);
 		sub.emit(note); // same event from a second relay
 		expect(seen).toEqual(['f0'.repeat(32)]);
+	});
+});
+
+describe('gift wrap (NIP-59, real crypto)', () => {
+	/** Capture whatever NDKEvent gets published without touching the network. */
+	function capturePublish(): { get: () => NDKEvent | undefined } {
+		let published: NDKEvent | undefined;
+		vi.spyOn(NDKEvent.prototype, 'publish').mockImplementation(async function (this: NDKEvent) {
+			published = this;
+			return new Set<NDKRelay>();
+		});
+		return { get: () => published };
+	}
+
+	it('throws before login', async () => {
+		await expect(
+			cyphertap.giftWrapAndPublish({ kind: 1060, content: 'x' }, 'ab'.repeat(32))
+		).rejects.toThrow('NDK not initialized');
+		await expect(
+			cyphertap.unwrapGiftWrap({
+				id: '',
+				pubkey: '',
+				kind: 1059,
+				content: '',
+				created_at: 0,
+				tags: [],
+				sig: ''
+			})
+		).rejects.toThrow('Signer not available');
+	});
+
+	it('publishes a kind-1059 wrap signed by an ephemeral key, p-tagged to the recipient', async () => {
+		const { pubkey: sender } = await injectSignedInNDK();
+		const recipient = await NDKPrivateKeySigner.generate().user();
+		const published = capturePublish();
+
+		const { id } = await cyphertap.giftWrapAndPublish(
+			{ kind: 1060, content: JSON.stringify({ secret: 'report body' }), tags: [['t', 'bug']] },
+			recipient.pubkey
+		);
+
+		const wrap = published.get();
+		expect(wrap?.kind).toBe(1059);
+		expect(wrap?.pubkey).not.toBe(sender); // ephemeral wrap key, not the user's
+		expect(wrap?.tagValue('p')).toBe(recipient.pubkey);
+		expect(wrap?.content).not.toContain('report body');
+		expect(wrap?.created_at).toBeLessThanOrEqual(Math.floor(Date.now() / 1000));
+		expect(id).toBe(wrap?.id);
+	});
+
+	it('round-trips: the recipient unwraps the rumor, anyone else gets null', async () => {
+		const { pubkey: sender } = await injectSignedInNDK();
+		const recipientSigner = NDKPrivateKeySigner.generate();
+		const recipient = await recipientSigner.user();
+		const published = capturePublish();
+
+		await cyphertap.giftWrapAndPublish(
+			{ kind: 1060, content: 'secret report', tags: [['t', 'bug']] },
+			recipient.pubkey
+		);
+		const wrap = published.get();
+		const wire = {
+			id: wrap?.id ?? '',
+			pubkey: wrap?.pubkey ?? '',
+			kind: 1059,
+			content: wrap?.content ?? '',
+			created_at: wrap?.created_at ?? 0,
+			tags: wrap?.tags ?? [],
+			sig: wrap?.sig ?? ''
+		};
+
+		// A different logged-in key can't decrypt someone else's wrap.
+		resetStores();
+		await injectSignedInNDK();
+		await expect(cyphertap.unwrapGiftWrap(wire)).resolves.toBeNull();
+
+		// The recipient recovers the rumor: original kind/content/tags, the
+		// sender's pubkey, and no signature (rumors are unsigned).
+		resetStores();
+		const recipientNdk = new NDK({ signer: recipientSigner });
+		recipientNdk.activeUser = recipient;
+		ndkInstance.set(recipientNdk as unknown as NDKSvelte);
+		currentUser.set(recipient);
+
+		const rumor = await cyphertap.unwrapGiftWrap(wire);
+		expect(rumor?.kind).toBe(1060);
+		expect(rumor?.content).toBe('secret report');
+		expect(rumor?.tags).toEqual([['t', 'bug']]);
+		expect(rumor?.pubkey).toBe(sender);
+		expect(rumor?.sig).toBe('');
 	});
 });
 
