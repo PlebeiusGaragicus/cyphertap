@@ -12,6 +12,7 @@ import {
   giftUnwrap,
   giftWrap
 } from '@nostr-dev-kit/ndk';
+import type NDKSvelte from '@nostr-dev-kit/ndk-svelte';
 import { getEncodedTokenV4 } from '@cashu/cashu-ts';
 
 // Import existing stores directly
@@ -71,6 +72,20 @@ function toSimpleEvent(event: NDKEvent): SimpleNostrEvent {
     sig: event.sig || '',
     relay: event.relay?.url
   };
+}
+
+/** Resolve a relay-targeting option into an NDKRelaySet: undefined = the
+ * configured pool; `relays` = pool ∪ relays; `relays` + `exclusive` = the
+ * given relays ONLY. */
+function buildRelaySet(
+  ndk: NDKSvelte,
+  opts?: { relays?: string[]; exclusive?: boolean }
+): NDKRelaySet | undefined {
+  if (!opts?.relays?.length) return undefined;
+  const urls = opts.exclusive
+    ? new Set(opts.relays)
+    : new Set([...ndk.pool.relays.keys(), ...opts.relays]);
+  return NDKRelaySet.fromRelayUrls([...urls], ndk);
 }
 
 export class CyphertapAPI {
@@ -264,21 +279,18 @@ export class CyphertapAPI {
   /**
    * Publish an event. `opts.relays` adds explicit relay URLs on top of the
    * configured pool — e.g. routing a reply to the relay the parent note was
-   * seen on, so the recipient actually finds it.
+   * seen on, so the recipient actually finds it. `opts.exclusive` publishes
+   * to `opts.relays` ONLY, skipping the pool — for app-specific event kinds
+   * that must never leave their dedicated relay.
    */
   async publishEvent(
     event: Partial<NDKRawEvent>,
-    opts?: { relays?: string[] }
+    opts?: { relays?: string[]; exclusive?: boolean }
   ): Promise<{ id: string; pubkey: string }> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
-    let relaySet: NDKRelaySet | undefined;
-    if (opts?.relays?.length) {
-      const urls = new Set([...ndk.pool.relays.keys(), ...opts.relays]);
-      relaySet = NDKRelaySet.fromRelayUrls([...urls], ndk);
-    }
-
+    const relaySet = buildRelaySet(ndk, opts);
     const ndkEvent = new NDKEvent(ndk, event);
     await this.publishWithRetryTolerance(ndkEvent, relaySet);
 
@@ -360,17 +372,26 @@ export class CyphertapAPI {
    * EOSE with the matching events newest-first. Cache and relays must both be
    * consulted — NDK's CACHE_FIRST default can satisfy paginated queries from
    * a partial cache and never ask the network. For live updates use
-   * subscribe/subscribeLatest instead.
+   * subscribe/subscribeLatest instead. `opts.relays` queries those relays
+   * ONLY instead of the configured pool — for app-specific event kinds that
+   * live on a dedicated relay.
    */
-  async fetchEvents(filter: SimpleNostrFilter): Promise<SimpleNostrEvent[]> {
+  async fetchEvents(
+    filter: SimpleNostrFilter,
+    opts?: { relays?: string[] }
+  ): Promise<SimpleNostrEvent[]> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
 
-    const events = await ndk.fetchEvents(filter as NDKFilter, {
-      closeOnEose: true,
-      groupable: false,
-      cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
-    });
+    const events = await ndk.fetchEvents(
+      filter as NDKFilter,
+      {
+        closeOnEose: true,
+        groupable: false,
+        cacheUsage: NDKSubscriptionCacheUsage.PARALLEL
+      },
+      buildRelaySet(ndk, { relays: opts?.relays, exclusive: true })
+    );
     return [...events].map(toSimpleEvent).sort((a, b) => b.created_at - a.created_at);
   }
 
@@ -411,12 +432,13 @@ export class CyphertapAPI {
    * recipient only), wrap it with an ephemeral key (kind 1059, randomized
    * created_at — backdated up to ~28h), and publish. The rumor stays
    * unsigned inside the wrap; its kind/tags/content are caller-defined.
-   * `opts.relays` adds explicit relay URLs on top of the configured pool.
+   * `opts.relays` adds explicit relay URLs on top of the configured pool;
+   * `opts.exclusive` publishes to `opts.relays` ONLY (see publishEvent).
    */
   async giftWrapAndPublish(
     rumor: Partial<SimpleNostrEvent>,
     recipientHex: string,
-    opts?: { relays?: string[] }
+    opts?: { relays?: string[]; exclusive?: boolean }
   ): Promise<{ id: string }> {
     const ndk = get(ndkInstance);
     if (!ndk) throw new Error('NDK not initialized');
@@ -438,12 +460,7 @@ export class CyphertapAPI {
     const recipient = ndk.getUser({ pubkey: recipientHex });
     const wrap = await giftWrap(event, recipient, ndk.signer);
 
-    let relaySet: NDKRelaySet | undefined;
-    if (opts?.relays?.length) {
-      const urls = new Set([...ndk.pool.relays.keys(), ...opts.relays]);
-      relaySet = NDKRelaySet.fromRelayUrls([...urls], ndk);
-    }
-    await this.publishWithRetryTolerance(wrap, relaySet);
+    await this.publishWithRetryTolerance(wrap, buildRelaySet(ndk, opts));
 
     return { id: wrap.id || '' };
   }

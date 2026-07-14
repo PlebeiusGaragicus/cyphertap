@@ -108,6 +108,26 @@ describe('publishEvent relay targeting', () => {
 		expect(urls).toContain('wss://relay.damus.io/');
 	});
 
+	it('publishes ONLY to the requested relays when exclusive is set', async () => {
+		await injectSignedInNDK();
+		let capturedSet: unknown;
+		vi.spyOn(NDKEvent.prototype, 'publish').mockImplementation(async function (
+			this: NDKEvent,
+			relaySet?: unknown
+		) {
+			capturedSet = relaySet;
+			await this.sign();
+			return new Set<NDKRelay>();
+		});
+
+		await cyphertap.publishEvent(
+			{ kind: 1059, content: 'pinned' },
+			{ relays: ['wss://relay.abvstudio.net'], exclusive: true }
+		);
+		const urls = [...(capturedSet as { relays: Set<{ url: string }> }).relays].map((r) => r.url);
+		expect(urls).toEqual(['wss://relay.abvstudio.net/']);
+	});
+
 	it('publishes to the default pool when no relays are given', async () => {
 		await injectSignedInNDK();
 		let capturedSet: unknown = 'unset';
@@ -194,6 +214,22 @@ describe('fetchEvents', () => {
 			sig: '',
 			relay: undefined
 		});
+	});
+
+	it('queries ONLY the given relays when opts.relays is set, the pool otherwise', async () => {
+		const { ndk } = await injectSignedInNDK();
+		const relaySets: unknown[] = [];
+		ndk.fetchEvents = (async (_f: unknown, _o: unknown, relaySet?: unknown) => {
+			relaySets.push(relaySet);
+			return new Set();
+		}) as unknown as typeof ndk.fetchEvents;
+
+		await cyphertap.fetchEvents({ kinds: [1059] });
+		await cyphertap.fetchEvents({ kinds: [1059] }, { relays: ['wss://relay.abvstudio.net'] });
+
+		expect(relaySets[0]).toBeUndefined();
+		const urls = [...(relaySets[1] as { relays: Set<{ url: string }> }).relays].map((r) => r.url);
+		expect(urls).toEqual(['wss://relay.abvstudio.net/']);
 	});
 });
 
