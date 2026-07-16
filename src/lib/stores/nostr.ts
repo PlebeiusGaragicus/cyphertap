@@ -321,6 +321,17 @@ export async function autoLogin() {
     return null;
   }
 
+  // Session state is module-level, but <Cyphertap> can mount many times per
+  // page life (consumers render it inside conditionally-shown chrome like
+  // drawers/sidebars). Re-running login() would redo the whole pipeline —
+  // NIP-60 wallet discovery hits the relays every time — so a live session
+  // makes remounts a no-op.
+  const existingNdk = get(ndkInstance);
+  if (existingNdk?.signer && get(currentUser)) {
+    d.log('Session already active, skipping auto-login');
+    return null;
+  }
+
   try {
     // Check if we have a stored key
     const storedKey = localStorage.getItem(ENCRYPTED_KEY);
