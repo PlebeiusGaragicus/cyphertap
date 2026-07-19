@@ -14,6 +14,19 @@ export {
 // its API is coupled to the library's NDK version — prefer the cyphertap API.
 export { getNDK } from './stores/nostr.js';
 
+// Headless session API: everything an app needs to own its login/account UI
+// without mounting <Cyphertap/> (the widget remains a thin shell over these).
+// A headless host must call configure() itself and run autoLogin() once at
+// startup — the widget's onMount does both for widget consumers.
+export {
+	autoLogin,
+	generateNewKeypair,
+	getLocalPrivateKey,
+	logout,
+	nip07Login,
+	privateKeyLogin
+} from './stores/nostr.js';
+
 // Library configuration (relays/mints) — call before mounting <Cyphertap/>,
 // or pass the equivalent component props
 export { configure, type CyphertapConfig } from './stores/config.js';

@@ -432,6 +432,16 @@ export function logout(
   }
   d.log('Logout complete');
 }
+/**
+ * The session's local private key (hex), or null when signing is delegated
+ * (NIP-07/NIP-46) or logged out. For app-owned key-backup UI — treat the
+ * value as radioactive: render on explicit reveal only, never log it.
+ */
+export function getLocalPrivateKey(): string | null {
+	const ndk = get(ndkInstance);
+	return ndk?.signer instanceof NDKPrivateKeySigner ? (ndk.signer.privateKey ?? null) : null;
+}
+
 export function getNDK(): NDKSvelte {
   const ndk = get(ndkInstance);
 
