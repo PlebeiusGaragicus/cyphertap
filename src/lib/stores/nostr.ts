@@ -283,7 +283,14 @@ export async function login(options: {
     // Start unpublished events monitor
     startUnpublishedEventsMonitor();
 
-    await initWallet();
+    // Headless identity-only consumers skip the NIP-60 wallet entirely
+    // (configure({ wallet: false })): no wallet discovery round-trips, no
+    // wallet events published for fresh keys.
+    if (getConfig().wallet !== false) {
+      await initWallet();
+    } else {
+      d.log('Wallet init skipped (configure wallet: false)');
+    }
 
 
     return;
